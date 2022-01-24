@@ -1,0 +1,94 @@
+.homeWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 .7rem;
+  top: -.9rem;
+}
+
+.homeWrapper h1 {
+  position: relative;
+  left: -12px;
+  margin-bottom: .5vh;
+  font-size: clamp(2.4rem, calc(5rem + 7vh - 1vw), 11rem);
+  font-family: 'Kolker Brush', cursive;
+  filter: drop-shadow(0 0 17px rgba(110, 243, 253, 0.2))
+}
+
+.enterGameWrapper {
+  width: calc(300px + 2vh);
+  max-width: 100%;
+  position: relative;
+  top: clamp(-10px, -20px, -30px);
+}
+
+.enterGameWrapper form {
+  display: flex;
+  flex-direction: column;
+}
+
+.enterGameWrapper label {
+  font-size: clamp(.7rem, calc(.6rem + 1vh), 1rem);
+  margin-bottom: .3rem;
+}
+
+.enterGameWrapper .idLabelWrapper {
+  margin-bottom: .3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.enterGameWrapper .idLabelWrapper label {
+  margin-bottom: 0;
+}
+
+.idLabelWrapper .generateId {
+  /* font-style: italic; */
+  cursor: pointer;
+  font-size: .65rem;
+  padding: .2rem .4rem;
+  border-radius: 5px;
+  opacity: .7;
+}
+
+.idLabelWrapper .generateId:hover {
+  opacity: 1;
+}
+
+.enterGameWrapper input {
+  padding: clamp(.5rem, calc(.5rem + 1vh), 1rem);
+  background: none;
+  border: 1px solid rgb(123, 245, 253, .7);
+  color: rgb(123, 245, 253);
+  font-size: .95rem;
+  border-radius: 10px;
+  margin-bottom: .6rem;
+}
+
+.enterGameWrapper input:focus {
+  outline: 1px solid rgba(179, 244, 248, 0.795);
+}
+
+.enterGameWrapper input:-webkit-autofill,
+.enterGameWrapper input:-webkit-autofill:hover,
+.enterGameWrapper input:-webkit-autofill:focus,
+.enterGameWrapper input:-webkit-autofill:active {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: rgb(123, 245, 253) !important;
+}
+
+.enterGameWrapper button {
+  opacity: 1;
+  background: rgb(123, 245, 253);
+  color: black;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-top: .9rem;
+  padding: clamp(.7rem, calc(.6rem + 1vh), 1rem);
+  border-radius: 10px;
+}

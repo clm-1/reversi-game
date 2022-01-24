@@ -1,0 +1,303 @@
+.gameWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  /* gap: 1rem; */
+  flex-direction: column;
+  align-items: center;
+  margin: 0 .7rem;
+  padding-top: 1rem;
+}
+
+.gameId {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .4rem;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 97%;
+  padding: .3rem 0 .3rem 0;
+  font-size: clamp(.6rem, calc(.5rem + 1vw), .9rem);
+  color: rgba(123, 244, 253, 0.733);
+  border-bottom: 1px solid rgba(123, 244, 253, 0.466);
+}
+
+.gameId span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gameId button {
+  border: none;
+  background: none;
+  margin-left: .25rem;
+}
+
+.gameId i {
+  font-size: 1.1rem;
+}
+
+.gameUI {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  margin-left: 1rem;
+}
+
+.scoreBoard {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  /* gap: .5rem; */
+  margin-bottom: 1rem;
+}
+
+.scoreBoard.portrait {
+  /* border: 1px solid rgba(123, 244, 253, 0.6); */
+  border-radius: 15px;
+  padding: .2rem;
+  flex-direction: column;
+  max-width: 65vh;
+  margin-bottom: .5rem;
+}
+
+.scoreBoard.landscape {
+  flex-direction: column;
+}
+
+.playerScore {
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  gap: .8rem;
+  padding: .6rem .9rem;
+  border-radius: 10px;
+  /* width: 150px; */
+  min-width: 180px;
+}
+
+.playerScore.currentPlayer {
+  outline: 1px solid rgba(123, 244, 253, 0.3)
+}
+
+.playerScore div {
+  border-radius: 50%;
+  height: clamp(3vw, 5vw, 50px);
+  width: clamp(3vw, 5vw, 50px);
+}
+
+.playerScore span {
+  font-size: clamp(.6rem, calc(.45rem + 2.5vw), 1.2rem);
+}
+
+.scoreWhite {
+  background: white;
+}
+
+.scoreBlack {
+  background: black;
+}
+
+.gameBoardWrapper {
+  width: 100%;
+  max-width: 65vh;
+  display: grid;
+  gap: .2rem;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.gameSquare {
+  border-radius: 5px;
+  cursor: pointer;
+  background: rgba(99, 177, 207, 0.22);
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gameSquare:after {
+  content: '';
+  display: block;
+  padding-top: 100%;
+}
+
+.gameSquare.validMove {
+  border: 1px solid rgba(111, 220, 224, 0.397);
+}
+
+.gamePiece {
+  position: absolute;
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  /* animation: gamePieceAnimation .4s ease-in-out forwards; */
+}
+
+.gameWrapper.roomFull {
+  opacity: .4;
+  pointer-events: none;
+}
+
+@keyframes gamePieceAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.whitePiece {
+  background: white;
+  /* animation: gamePieceAnimation .7s ease-in-out forwards; */
+}
+
+.blackPiece {
+  background: black;
+  /* animation: gamePieceAnimation 1s ease-in-out forwards; */
+}
+
+.gameMessageWrapper {
+  width: 100%;
+  max-width: 75vh;
+  display: flex;
+  border-radius: 15px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(90deg, rgba(151,245,255,0) 0%, rgba(62, 155, 165, 0.164) 50%, rgba(146,198,203,0) 100%);
+  gap: .7rem;
+  flex: 1;
+  padding: .5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.gameMessageWrapper p {
+  font-size: clamp(1rem, calc(.6rem + 1vh), 1.4rem);
+  transition: .7s;
+  color: rgb(123, 245, 253);
+  opacity: .6;
+}
+
+.gameMessageWrapper p.newMsg {
+  opacity: 1;
+  transform: scale(1.07);
+  filter: drop-shadow(0 0 4px rgb(123, 245, 253, .4));
+}
+
+.gameMessageWrapper.newMsg {
+  color: rgb(123, 245, 253);
+}
+
+.gameHr {
+  width: 100%;
+  margin: .7rem 0;
+  border: none;
+  border-bottom: 1px solid rgba(123, 244, 253, 0.24);
+}
+
+.gameBtnWrapper {
+  width: 100%;
+  max-width: 230px;
+  margin-top: auto;
+  text-align: center;
+}
+
+.gameBtnWrapper button {
+  background: none;
+  padding: 1rem 2rem;
+  width: 100%;
+  border-radius: 15px;
+}
+
+@keyframes noMovesAnimation {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.gameBoardMessage {
+  width: 100%;
+  padding: .8rem;
+  text-align: center;
+  font-size: 1.4rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.486);
+  color: white;
+  animation: noMovesAnimation 4.5s infinite;
+}
+
+.landscape {
+  display: none;
+  pointer-events: none;
+}
+
+@media screen and (orientation: landscape) {
+  .gameWrapper {
+    flex-direction: row;
+  }
+
+  .gameUI {
+    width: 30%;
+  }
+
+  .gameMessageWrapper {
+    border: 1px solid rgb(123, 245, 253, .6);
+    background: none;
+  }
+
+  .playerScore {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 1rem;
+  }
+
+  .gameBoardWrapper {
+    width: 70%;
+    max-width: 80vh;
+  }
+
+  .gameBtnWrapper {
+    max-width: 100%;
+  }
+
+  .portrait {
+    display: none;
+    pointer-events: none;
+  }
+
+  .landscape {
+    display: flex;
+    pointer-events: initial;
+  }
+}
