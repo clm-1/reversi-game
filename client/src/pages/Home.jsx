@@ -6,13 +6,11 @@ import styles from '../css/Home.module.css'
 
 const Home = () => {
   const navigate = useNavigate()
-  // const [username, setUsername] = useState('')
-  // const [gameId, setGameId] = useState('')
   const usernameRef = useRef()
   const gameIdRef = useRef()
 
   useEffect(() => {
-    const socket = io(import.meta.env.BACKEND_URL)
+    const socket = io(import.meta.env.VITE_BACKEND_URL)
     socket.on('connection-made', data => {
       console.log(data);
     })
