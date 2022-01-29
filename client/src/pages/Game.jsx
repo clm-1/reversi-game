@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { io } from 'socket.io-client'
 import WaitingForPlayer from '../components/WaitingForPlayer'
+import { useSocketContext } from '../contexts/SocketContext'
 import styles from '../css/Game.module.css'
 
 const Game = () => {
+  // const { socket, setSocket, setGame, closeSocket } = useSocketContext()
+  const  { setInGame } = useSocketContext()
   const [you, setYou] = useState(null)
   const [currentPlayer, setCurrentPlayer] = useState('B')
   const [playersInGame, setPlayersInGame] = useState([])
@@ -40,14 +43,13 @@ const Game = () => {
 
   // Set up socket connection
   useEffect(() => {
-    const s = io('http://localhost:3001')
+    const s = io(import.meta.env.VITE_BACKEND_URL)
     setSocket(s)
 
     // Might need to save socket in context
+    // setGame(gameId)
     // return () => {
-    //   if (socket) {
-    //     socket.disconnect()
-    //   }
+    //   closeSocket()
     // }
   }, [])
 
@@ -59,6 +61,7 @@ const Game = () => {
     socket.on('game-joined', (message, newPlayerColor) => {
       console.log(message);
       setYou(newPlayerColor)
+      setInGame(true)
     })
 
     socket.on('set-players', playersFromSocket => {
@@ -98,6 +101,7 @@ const Game = () => {
 
   const handleQuitGameClick = () => {
     socket.disconnect()
+    // socket.emit('leave-game')
     navigate('/')
   }
 

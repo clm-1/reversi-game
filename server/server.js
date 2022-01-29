@@ -39,6 +39,18 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
+    socket.leave(game)
+    socket.broadcast.to(game).emit('player-disconnected', socket.id)
+    activePlayers = activePlayers.filter(player => player.player !== socket.id)
+    const playersInGame = activePlayers.filter(player => player.gameId === game)
+    io.in(game).emit('set-players', playersInGame)
+    if (!playersInGame.length) delete activeGames[game]
+  })
+
+  socket.on('leave-room', () => {
+    console.log('left room');
+    const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
+    socket.leave(game)
     socket.broadcast.to(game).emit('player-disconnected', socket.id)
     activePlayers = activePlayers.filter(player => player.player !== socket.id)
     const playersInGame = activePlayers.filter(player => player.gameId === game)

@@ -1,19 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { io } from 'socket.io-client'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
+import { useSocketContext } from '../contexts/SocketContext'
 import styles from '../css/Home.module.css'
 
 const Home = () => {
+  const { inGame } = useSocketContext()
   const navigate = useNavigate()
   const usernameRef = useRef()
   const gameIdRef = useRef()
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_BACKEND_URL)
-    socket.on('connection-made', data => {
-      console.log(data);
-    })
+    if (inGame) {
+      window.location.reload();
+    }
   }, [])
 
   const handleGenerateIdClick = () => (
