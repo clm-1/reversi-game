@@ -7,7 +7,7 @@ import styles from '../css/Game.module.css'
 
 const Game = () => {
   // const { socket, setSocket, setGame, closeSocket } = useSocketContext()
-  const  { setInGame } = useSocketContext()
+  const { setInGame } = useSocketContext()
   const [you, setYou] = useState(null)
   const [currentPlayer, setCurrentPlayer] = useState('B')
   const [playersInGame, setPlayersInGame] = useState([])
@@ -15,10 +15,11 @@ const Game = () => {
     W: 'White',
     B: 'Black'
   })
+  const [gameOver, setGameOver] = useState(false)
   const { gameId } = useParams()
   const [socket, setSocket] = useState()
   const [score, setScore] = useState({ white: 2, black: 2 })
-  const [gameBoardState, setGameBoardState] = useState([
+  const initialGameBoardState = [
     'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X',
     '0', '0', '0', '0', '0', '0', '0', '0', 'X',
     '0', '0', '0', '0', '0', '0', '0', '0', 'X',
@@ -29,7 +30,8 @@ const Game = () => {
     '0', '0', '0', '0', '0', '0', '0', '0', 'X',
     '0', '0', '0', '0', '0', '0', '0', '0', 'X',
     'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X',
-  ])
+  ]
+  const [gameBoardState, setGameBoardState] = useState(initialGameBoardState)
   const [placedPieces, setPlacedPieces] = useState([39, 40, 48, 49])
   const [currentValidMoves, setCurrentValidMoves] = useState({})
   const [gameBoardMsg, setGameBoardMsg] = useState(null)
@@ -41,9 +43,20 @@ const Game = () => {
   const moveToMake = useRef()
   const gameIdRef = useRef()
 
+  const resetGame = () => {
+    setGameBoardState(initialGameBoardState)
+    setCurrentPlayer('B')
+    setPlacedPieces([39, 40, 48, 49])
+    setGameMsg('Black\'s turn')
+    setCurrentValidMoves({})
+    setScore({ white: 2, black: 2 })
+    checkValidMoves(initialGameBoardState, [39, 40, 48, 49], 'B')
+  }
+
   // Set up socket connection
   useEffect(() => {
-    const s = io(import.meta.env.VITE_BACKEND_URL)
+    // const s = io(import.meta.env.VITE_BACKEND_URL)
+    const s = io('http://localhost:3001')
     setSocket(s)
 
     // Might need to save socket in context
@@ -93,6 +106,11 @@ const Game = () => {
       moveToMake.current = move
       setPlacedPieces(newPlacedPieces)
       setGameBoardState(gameState)
+    })
+
+    socket.on('reset-game', () => {
+      console.log('reset!!!!');
+      resetGame()
     })
   }, [socket])
 
@@ -200,7 +218,10 @@ const Game = () => {
     setGameMsg(outcome)
     setGameBoardMsg(outcome)
     setCurrentValidMoves({})
-    setTimeout(() => { setGameBoardMsg(null) }, 4500)
+    setTimeout(() => {
+      setGameOver(true)
+      setGameBoardMsg(null)
+    }, 4500)
   }
 
   useEffect(() => {
@@ -253,7 +274,7 @@ const Game = () => {
     let tempGameStateArray = [...gameBoardState]
     tempGameStateArray[i] = currentPlayer
     console.log('place first piece')
-    
+
     // currentValidMoves[i].forEach(index => tempGameStateArray[index] = currentPlayer)
     // countScore(tempGameStateArray)
     const newPlacedPieces = [...placedPieces, i]
@@ -283,6 +304,11 @@ const Game = () => {
     navigator.clipboard.writeText(gameIdRef.current.innerText)
   }
 
+  // Send reset game event to server, will emit back to both players
+  const handleResetGameClick = () => {
+    socket.emit('reset-game', gameId)
+  }
+
   const renderGameBoard = () => {
     return (
       gameBoardState.map((square, i) => {
@@ -304,60 +330,65 @@ const Game = () => {
 
   return (
     <>
-    { playersInGame.length < 2 && <WaitingForPlayer />}
-    <div className={styles.gameId}>
-      <p>Game ID:</p>
-      <span ref={gameIdRef}>{gameId}</span>
-      <button onClick={handleGameIdClick}><i className="fas fa-paste"></i></button>
-    </div>
-    <div className={`${styles.gameWrapper} ${roomFull ? styles.roomFull : ''}`}>
-      <div className={`${styles.scoreBoard} ${styles.portrait}`}>
-        <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
-          <div className={styles.scoreWhite}></div>
-          <span>WHITE : </span>
-          <span>{score.white}</span>
-        </div>
-        <div className={`${styles.playerScore} ${currentPlayer === 'B' ? styles.currentPlayer : ''}`}>
-          <div className={styles.scoreBlack}></div>
-          <span>BLACK : </span>
-          <span>{score.black}</span>
-        </div>
+      {playersInGame.length < 2 && <WaitingForPlayer />}
+      <div className={styles.gameId}>
+        <p>Game ID:</p>
+        <span ref={gameIdRef}>{gameId}</span>
+        <button onClick={handleGameIdClick}><i className="fas fa-paste"></i></button>
       </div>
-
-      {gameBoardState?.length &&
-        <div className={styles.gameBoardWrapper}>
-          {renderGameBoard()}
-        </div>}
-
-      <div className={styles.gameUI}>
-        <div className={`${styles.scoreBoard} ${styles.landscape}`}>
+      <div className={`${styles.gameWrapper} ${roomFull ? styles.roomFull : ''}`}>
+        <div className={`${styles.scoreBoard} ${styles.portrait}`}>
           <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
             <div className={styles.scoreWhite}></div>
+            <span>WHITE : </span>
             <span>{score.white}</span>
           </div>
           <div className={`${styles.playerScore} ${currentPlayer === 'B' ? styles.currentPlayer : ''}`}>
             <div className={styles.scoreBlack}></div>
+            <span>BLACK : </span>
             <span>{score.black}</span>
           </div>
         </div>
 
-        <div className={`${styles.gameMessageWrapper}`}>
-          <p className={newMsg ? styles.newMsg : ''}>{gameMsg.toUpperCase()}</p>
+        {gameBoardState?.length &&
+          <div className={styles.gameBoardWrapper}>
+            {renderGameBoard()}
+          </div>}
+
+        <div className={styles.gameUI}>
+          <div className={`${styles.scoreBoard} ${styles.landscape}`}>
+            <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
+              <div className={styles.scoreWhite}></div>
+              <span>{score.white}</span>
+            </div>
+            <div className={`${styles.playerScore} ${currentPlayer === 'B' ? styles.currentPlayer : ''}`}>
+              <div className={styles.scoreBlack}></div>
+              <span>{score.black}</span>
+            </div>
+          </div>
+
+          <div className={`${styles.gameMessageWrapper}`}>
+            <p className={newMsg ? styles.newMsg : ''}>{gameMsg.toUpperCase()}</p>
+          </div>
+
+          {/* <hr className={styles.gameHr} /> */}
+
+          <div className={styles.gameBtnWrapper}>
+            <button onClick={handleQuitGameClick}>QUIT GAME</button>
+          </div>
         </div>
 
-        {/* <hr className={styles.gameHr} /> */}
+        {gameBoardMsg &&
+          <div className={styles.gameBoardMessage}>
+            <p>{gameBoardMsg}</p>
+          </div>
+        }
 
-        <div className={styles.gameBtnWrapper}>
-          <button onClick={handleQuitGameClick}>QUIT GAME</button>
-        </div>
+        {gameOver &&
+          <div className={styles.playAgainBtnWrapper}>
+            <button onClick={handleResetGameClick}>PLAY AGAIN</button>
+          </div>}
       </div>
-
-      {gameBoardMsg &&
-        <div className={styles.gameBoardMessage}>
-          <p>{gameBoardMsg}</p>
-        </div>
-      }
-    </div>
     </>
   )
 }

@@ -37,18 +37,13 @@ io.on('connection', socket => {
     activeGames[game] = { gameState, placedPieces, currentPlayer }
   })
 
-  socket.on('disconnect', () => {
-    const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
-    socket.leave(game)
-    socket.broadcast.to(game).emit('player-disconnected', socket.id)
-    activePlayers = activePlayers.filter(player => player.player !== socket.id)
-    const playersInGame = activePlayers.filter(player => player.gameId === game)
-    io.in(game).emit('set-players', playersInGame)
-    if (!playersInGame.length) delete activeGames[game]
+  socket.on('reset-game', (gameId) => {
+    console.log('game', gameId);
+    activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B'}
+    io.in(gameId).emit('reset-game')
   })
 
-  socket.on('leave-room', () => {
-    console.log('left room');
+  socket.on('disconnect', () => {
     const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
     socket.leave(game)
     socket.broadcast.to(game).emit('player-disconnected', socket.id)

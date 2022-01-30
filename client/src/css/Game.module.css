@@ -262,6 +262,11 @@
   pointer-events: none;
 }
 
+.playAgainBtnWrapper {
+  position: absolute;
+  top: 20px;
+}
+
 @media screen and (orientation: landscape) {
   .gameWrapper {
     flex-direction: row;
