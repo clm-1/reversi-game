@@ -69,10 +69,12 @@ const Game = () => {
     })
 
     socket.on('get-game-state', game => {
+      console.log('getting game state:', game);
       setGameBoardState(game.gameState)
       setCurrentPlayer(game.currentPlayer)
       setPlacedPieces(game.placedPieces)
       countScore(game.gameState)
+      checkValidMoves(game.gameState, game.placedPieces, game.currentPlayer)
     })
 
     // Display message if opponent is disconnected
