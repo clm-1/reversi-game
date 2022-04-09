@@ -1,5 +1,7 @@
 .waitingForPlayerWrapper {
-  position: absolute;
+  position: fixed;
+  top: 0;
+  left: 0;
   z-index: 3;
   height: 100vh;
   width: 100vw;
@@ -7,6 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0 1.5rem;
 }
 
 .waitingForPlayerModal {
@@ -22,4 +25,11 @@
   align-items: center;
   flex-direction: column;
   gap: 1.5rem;
+  font-size: clamp(.7rem, calc(.7rem + 1vw), 1.1rem);
+}
+
+.waitingForPlayerModal button {
+  background: none;
+  padding: 1rem;
+  border-radius: 10px;
 }

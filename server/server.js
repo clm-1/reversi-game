@@ -33,7 +33,9 @@ io.on('connection', socket => {
   })
 
   socket.on('set-game-state', (gameState, placedPieces, currentPlayer )=> {
-    const game = activePlayers.filter(player => player.player === socket.id)[0].gameId
+    // Take a look at this later, add error handling
+    console.log('activePlayers', activePlayers)
+    const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
     activeGames[game] = { gameState, placedPieces, currentPlayer }
   })
 

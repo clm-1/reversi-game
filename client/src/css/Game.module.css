@@ -2,11 +2,10 @@
   position: relative;
   display: flex;
   justify-content: center;
-  /* gap: 1rem; */
   flex-direction: column;
   align-items: center;
   margin: 0 .7rem;
-  padding-top: 1rem;
+  padding-top: 2rem;
 }
 
 .gameId {
@@ -18,11 +17,12 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 97%;
-  padding: .3rem 0 .3rem 0;
-  font-size: clamp(.6rem, calc(.5rem + 1vw), .9rem);
-  color: rgba(123, 244, 253, 0.733);
-  border-bottom: 1px solid rgba(123, 244, 253, 0.466);
+  width: 100%;
+  padding: .45rem 0 .35rem 0;
+  font-size: clamp(.4rem, calc(.4rem + 1vw), .9rem);
+  color: rgba(123, 244, 253, 0.5);
+  background-color: rgb(125 204 204 / 11%);
+  /* border-bottom: 1px solid rgba(123, 244, 253, 0.466); */
 }
 
 .gameId span {
@@ -38,7 +38,8 @@
 }
 
 .gameId i {
-  font-size: 1.1rem;
+  color: rgba(123, 244, 253, 0.5);
+  font-size: clamp(.5rem, calc(.5rem + 1vw), 1.1rem);
 }
 
 .gameUI {
@@ -56,46 +57,56 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  /* gap: .5rem; */
   margin-bottom: 1rem;
 }
 
-.scoreBoard.portrait {
-  /* border: 1px solid rgba(123, 244, 253, 0.6); */
+.scoreBoard {
   border-radius: 15px;
   padding: .2rem;
   flex-direction: column;
-  max-width: 65vh;
+  max-width: 600px;
   margin-bottom: .5rem;
-}
-
-.scoreBoard.landscape {
-  flex-direction: column;
 }
 
 .playerScore {
   display: flex;
   align-items: center;
-  /* justify-content: center; */
-  gap: .8rem;
-  padding: .6rem .9rem;
+  gap: .5rem;
+  padding: .3rem .05rem;
   border-radius: 10px;
-  /* width: 150px; */
-  min-width: 180px;
+  width: 100%;
+  opacity: .7;
 }
 
 .playerScore.currentPlayer {
-  outline: 1px solid rgba(123, 244, 253, 0.3)
+  opacity: 1;
 }
 
-.playerScore div {
+.playerScore .scoreWhite,
+.playerScore .scoreBlack {
+  border: 1px solid rgb(123, 245, 253, .3);
   border-radius: 50%;
-  height: clamp(3vw, 5vw, 50px);
-  width: clamp(3vw, 5vw, 50px);
+  height: clamp(15px, calc(10px + 2.2vw), 35px);
+  width: clamp(15px, calc(10px + 2.2vw), 35px);
+  margin-left: auto;
+}
+
+.playerScore .winsWrapper {
+  background-color: rgba(70, 146, 179, 0.229);
+  padding: .25rem .7rem;
+  border-radius: 7px;
 }
 
 .playerScore span {
-  font-size: clamp(.6rem, calc(.45rem + 2.5vw), 1.2rem);
+  font-size: clamp(.5rem, calc(.4rem + 2.5vw), 1.2rem);
+}
+
+.playerScore span.scoreNumber {
+  font-size: clamp(.6rem, calc(.45rem + 2.5vw), 1.4rem);
+}
+
+.playerScore span.scoreX {
+  line-height: 1;
 }
 
 .scoreWhite {
@@ -106,16 +117,23 @@
   background: black;
 }
 
+.scoreDivider {
+  height: 1px;
+  width: 100%;
+  background: rgba(70, 166, 179, 0.35);
+  margin: .2rem 0;
+}
+
 .gameBoardWrapper {
   width: 100%;
-  max-width: 65vh;
+  max-width: 600px;
   display: grid;
-  gap: .2rem;
+  gap: clamp(.05rem, calc(.1rem + .5vw), .3rem);
   grid-template-columns: repeat(8, 1fr);
 }
 
 .gameSquare {
-  border-radius: 5px;
+  border-radius: clamp(1px, calc(2px + .5vw), 5px);
   cursor: pointer;
   background: rgba(99, 177, 207, 0.22);
   position: relative;
@@ -191,7 +209,7 @@
 }
 
 .gameMessageWrapper p {
-  font-size: clamp(1rem, calc(.6rem + 1vh), 1.4rem);
+  font-size: clamp(.8rem, calc(.6rem + 1.2vw), 1.2rem);
   transition: .7s;
   color: rgb(123, 245, 253);
   opacity: .6;
@@ -215,15 +233,17 @@
 }
 
 .gameBtnWrapper {
-  width: 100%;
-  max-width: 230px;
-  margin-top: auto;
+  /* width: 70%; */
+  max-width: 220px;
+  margin-top: calc(.7rem + .7vw);
+  margin-bottom: 2rem;
   text-align: center;
 }
 
 .gameBtnWrapper button {
+  font-size: clamp(.5rem, calc(.5rem + 1vw), .9rem);
   background: none;
-  padding: 1rem 2rem;
+  padding: clamp(.5rem, calc(.5rem + 2vw), 1rem) clamp(1rem, calc(1rem + 4.5vw), 3rem);
   width: 100%;
   border-radius: 15px;
 }
@@ -267,7 +287,7 @@
   top: 20px;
 }
 
-@media screen and (orientation: landscape) {
+/* @media screen and (orientation: landscape) {
   .gameWrapper {
     flex-direction: row;
   }
@@ -304,5 +324,11 @@
   .landscape {
     display: flex;
     pointer-events: initial;
+  }
+} */
+
+@media screen and (min-width: 500px) {
+  .playerScore {
+    gap: .8rem;
   }
 }

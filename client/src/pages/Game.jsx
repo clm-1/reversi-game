@@ -300,8 +300,8 @@ const Game = () => {
   }
 
   // Save game id to clipboard on click
-  const handleGameIdClick = () => {
-    navigator.clipboard.writeText(gameIdRef.current.innerText)
+  const handleGameIdClick = (idToCopy) => {
+    navigator.clipboard.writeText(idToCopy)
   }
 
   // Send reset game event to server, will emit back to both players
@@ -330,23 +330,32 @@ const Game = () => {
 
   return (
     <>
-      {playersInGame.length < 2 && <WaitingForPlayer />}
+      {playersInGame.length < 2 && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} />}
       <div className={styles.gameId}>
         <p>Game ID:</p>
         <span ref={gameIdRef}>{gameId}</span>
-        <button onClick={handleGameIdClick}><i className="fas fa-paste"></i></button>
+        <button onClick={() => handleGameIdClick(gameIdRef.current?.innerText)}><i className="fas fa-paste"></i></button>
       </div>
       <div className={`${styles.gameWrapper} ${roomFull ? styles.roomFull : ''}`}>
-        <div className={`${styles.scoreBoard} ${styles.portrait}`}>
+        <div className={`${styles.scoreBoard}`}>
           <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
+            <div className={styles.winsWrapper}>
+              <span>0</span>
+            </div>
+            <span>WHITE</span>
             <div className={styles.scoreWhite}></div>
-            <span>WHITE : </span>
-            <span>{score.white}</span>
+            <span className={styles.scoreX}>x</span>
+            <span className={styles.scoreNumber}>{score.white}</span>
           </div>
+          <div className={styles.scoreDivider}></div>
           <div className={`${styles.playerScore} ${currentPlayer === 'B' ? styles.currentPlayer : ''}`}>
+            <div className={styles.winsWrapper}>
+              <span>1</span>
+            </div>
+            <span>BLACK</span>
             <div className={styles.scoreBlack}></div>
-            <span>BLACK : </span>
-            <span>{score.black}</span>
+            <span className={styles.scoreX}>x</span>
+            <span className={styles.scoreNumber}>{score.black}</span>
           </div>
         </div>
 
@@ -356,7 +365,7 @@ const Game = () => {
           </div>}
 
         <div className={styles.gameUI}>
-          <div className={`${styles.scoreBoard} ${styles.landscape}`}>
+          {/* <div className={`${styles.scoreBoard} ${styles.landscape}`}>
             <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
               <div className={styles.scoreWhite}></div>
               <span>{score.white}</span>
@@ -365,7 +374,7 @@ const Game = () => {
               <div className={styles.scoreBlack}></div>
               <span>{score.black}</span>
             </div>
-          </div>
+          </div> */}
 
           <div className={`${styles.gameMessageWrapper}`}>
             <p className={newMsg ? styles.newMsg : ''}>{gameMsg.toUpperCase()}</p>
@@ -374,7 +383,7 @@ const Game = () => {
           {/* <hr className={styles.gameHr} /> */}
 
           <div className={styles.gameBtnWrapper}>
-            <button onClick={handleQuitGameClick}>QUIT GAME</button>
+            <button className="outlined" onClick={handleQuitGameClick}>QUIT GAME</button>
           </div>
         </div>
 
