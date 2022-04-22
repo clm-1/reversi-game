@@ -234,7 +234,7 @@ const Game = () => {
       moveToMake.current.piecesToChange.shift()
       setTimeout(() => {
         setGameBoardState(tempGameStateArray)
-      }, 5)
+      }, 0)
 
       if (!moveToMake.current.piecesToChange.length) {
         moveToMake.current = null;
@@ -330,7 +330,7 @@ const Game = () => {
 
   return (
     <>
-      {playersInGame.length < 2 && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} />}
+      {playersInGame.length < 2 && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick}/>}
       <div className={styles.gameId}>
         <p>Game ID:</p>
         <span ref={gameIdRef}>{gameId}</span>

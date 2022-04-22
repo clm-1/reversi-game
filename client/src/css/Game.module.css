@@ -22,6 +22,7 @@
   font-size: clamp(.4rem, calc(.4rem + 1vw), .9rem);
   color: rgba(123, 244, 253, 0.5);
   background-color: rgb(125 204 204 / 11%);
+  z-index: 1;
   /* border-bottom: 1px solid rgba(123, 244, 253, 0.466); */
 }
 

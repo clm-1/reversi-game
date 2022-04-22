@@ -13,23 +13,39 @@
 }
 
 .waitingForPlayerModal {
+  padding: 3rem 2.5rem;
   background: rgb(41, 56, 58);
-  width: 100%;
-  max-width: 400px;
-  height: 90vh;
-  max-height: 200px;
+  max-width: 90vw;
+  max-height: 90vh;
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.568);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  /* border: 2px solid rgba(123, 244, 253, 0.222); */
   gap: 1.5rem;
   font-size: clamp(.7rem, calc(.7rem + 1vw), 1.1rem);
+  /* overflow: hidden; */
+}
+
+.waitingForPlayerModal .buttonsWrapper {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  margin-top: 1rem;
 }
 
 .waitingForPlayerModal button {
   background: none;
   padding: 1rem;
   border-radius: 10px;
+  min-width: 130px;
+}
+
+@media screen and (min-width: 400px) {
+  .waitingForPlayerModal .buttonsWrapper {
+    flex-direction: row;
+    margin-top: .5rem;
+  }
 }

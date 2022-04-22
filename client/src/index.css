@@ -29,9 +29,12 @@ button.outlined:hover {
   transition: .3s;
 }
 
-button.outlined:active {
+button:active {
   transition: none;
   transform: scale(1.02);
+}
+
+button.outlined:active {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.493);
 }
 
@@ -43,10 +46,4 @@ button.outlined:active {
   min-height: 100vh;
   max-width: 1366px;
   margin: 0 auto;
-}
-
-@media screen and (min-width: 500px) {
-  .App {
-
-  }
 }
