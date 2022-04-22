@@ -1,11 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
-import { useSocketContext } from '../contexts/SocketContext'
+import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Home.module.css'
 
 const Home = () => {
-  const { inGame } = useSocketContext()
+  const { inGame } = useGameContext()
   const navigate = useNavigate()
   const usernameRef = useRef()
   const gameIdRef = useRef()
@@ -37,7 +37,7 @@ const Home = () => {
             <label htmlFor="game-id">GAME ID:</label>
             <div className={styles.generateId} onClick={handleGenerateIdClick}>GENERATE NEW ID</div>
           </div>
-          <input className={styles.gameIdInput} name="game-id" type="text" ref={gameIdRef} value={uuidv4().slice(0, 32)} readonly />
+          <input className={styles.gameIdInput} name="game-id" type="text" ref={gameIdRef} />
           <button type="submit">ENTER GAME</button>
         </form>
       </div>

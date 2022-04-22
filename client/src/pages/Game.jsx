@@ -2,19 +2,15 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { io } from 'socket.io-client'
 import WaitingForPlayer from '../components/WaitingForPlayer'
-import { useSocketContext } from '../contexts/SocketContext'
+import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Game.module.css'
 
 const Game = () => {
   // const { socket, setSocket, setGame, closeSocket } = useSocketContext()
-  const { setInGame } = useSocketContext()
+  const { setInGame, playerNames } = useGameContext()
   const [you, setYou] = useState(null)
   const [currentPlayer, setCurrentPlayer] = useState('B')
   const [playersInGame, setPlayersInGame] = useState([])
-  const [playerNames, setPlayerNames] = useState({
-    W: 'White',
-    B: 'Black'
-  })
   const [gameOver, setGameOver] = useState(false)
   const { gameId } = useParams()
   const [socket, setSocket] = useState()
