@@ -72,6 +72,11 @@
   outline: 1px solid rgba(179, 244, 248, 0.795);
 }
 
+.enterGameWrapper input.gameIdInput {
+  color: rgba(123, 244, 253, 0.677);
+  /* pointer-events: none; */
+}
+
 .enterGameWrapper input:-webkit-autofill,
 .enterGameWrapper input:-webkit-autofill:hover,
 .enterGameWrapper input:-webkit-autofill:focus,

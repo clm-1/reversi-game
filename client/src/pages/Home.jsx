@@ -17,7 +17,7 @@ const Home = () => {
   }, [])
 
   const handleGenerateIdClick = () => (
-    gameIdRef.current.value = uuidv4()
+    gameIdRef.current.value = uuidv4().slice(0, 32)
   )
 
   const handleEnterGameClick = (e) => {
@@ -37,7 +37,7 @@ const Home = () => {
             <label htmlFor="game-id">GAME ID:</label>
             <div className={styles.generateId} onClick={handleGenerateIdClick}>GENERATE NEW ID</div>
           </div>
-          <input name="game-id" type="text" ref={gameIdRef} />
+          <input className={styles.gameIdInput} name="game-id" type="text" ref={gameIdRef} value={uuidv4().slice(0, 32)} readonly />
           <button type="submit">ENTER GAME</button>
         </form>
       </div>
