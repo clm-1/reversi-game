@@ -8,6 +8,11 @@ const useGameContext = () => {
 }
 
 const GameContextProvider = ({ children }) => {
+  // Set the local player
+  const [localPlayer, setLocalPlayer] = useState({
+    name: '',
+    color: ''
+  })
   // const [socket, setSocket] = useState(null)
   // const [game, setGame] = useState(null)
   const [inGame, setInGame] = useState(false)
@@ -15,6 +20,16 @@ const GameContextProvider = ({ children }) => {
     W: 'White',
     B: 'Black'
   })
+
+  // useEffect(() => {
+  //   const username = localStorage.getItem('reversi-name')
+  //   if (username) setLocalPlayer({ ...localPlayer, name: username })
+  // }, [])
+
+  const updateLocalPlayer = (name) => {
+    // localStorage.setItem('reversi-name', name)
+    setLocalPlayer({ ...localPlayer, name })
+  }
 
   // const socketConnection = () => {
   //   // const s = io(import.meta.env.VITE_BACKEND_URL)
@@ -48,7 +63,10 @@ const GameContextProvider = ({ children }) => {
     // closeSocket,
     inGame,
     setInGame,
-    playerNames
+    playerNames,
+    localPlayer,
+    setLocalPlayer,
+    updateLocalPlayer,
   }
 
   return (

@@ -4,7 +4,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  margin: 0 .7rem;
+  /* margin: 0 .7rem; */
   padding-top: 2rem;
 }
 
@@ -56,17 +56,12 @@
 .scoreBoard {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.scoreBoard {
+  margin-bottom: .5rem;
   border-radius: 15px;
   padding: .2rem;
-  flex-direction: column;
-  max-width: 600px;
-  margin-bottom: .5rem;
 }
 
 .playerScore {
@@ -127,7 +122,6 @@
 
 .gameBoardWrapper {
   width: 100%;
-  max-width: 600px;
   display: grid;
   gap: clamp(.05rem, calc(.1rem + .5vw), .3rem);
   grid-template-columns: repeat(8, 1fr);

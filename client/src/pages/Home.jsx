@@ -5,7 +5,7 @@ import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Home.module.css'
 
 const Home = () => {
-  const { inGame } = useGameContext()
+  const { inGame, setLocalPlayer, localPlayer, updateLocalPlayer } = useGameContext()
   const navigate = useNavigate()
   const usernameRef = useRef()
   const gameIdRef = useRef()
@@ -23,6 +23,7 @@ const Home = () => {
   const handleEnterGameClick = (e) => {
     e.preventDefault()
     if (!gameIdRef.current.value) return console.log('enter username and game id');
+    updateLocalPlayer(usernameRef.current.value)
     navigate(`/game/${gameIdRef.current.value}`)
   }
 

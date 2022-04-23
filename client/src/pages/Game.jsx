@@ -7,8 +7,8 @@ import styles from '../css/Game.module.css'
 
 const Game = () => {
   // const { socket, setSocket, setGame, closeSocket } = useSocketContext()
-  const { setInGame, playerNames } = useGameContext()
-  const [you, setYou] = useState(null)
+  const { setInGame, playerNames, localPlayer, setLocalPlayer } = useGameContext()
+  // const [you, setYou] = useState(null)
   const [currentPlayer, setCurrentPlayer] = useState('B')
   const [playersInGame, setPlayersInGame] = useState([])
   const [gameOver, setGameOver] = useState(false)
@@ -63,17 +63,23 @@ const Game = () => {
   }, [])
 
   useEffect(() => {
+    console.log('localPlayer', localPlayer)
+  }, [localPlayer])
+
+  useEffect(() => {
     if (socket == null) return
     console.log('socket', socket);
-    socket.emit('join-game', gameId)
+    socket.emit('join-game', gameId, localPlayer.name)
 
-    socket.on('game-joined', (message, newPlayerColor) => {
+    socket.on('game-joined', (message, newPlayerColor, newPlayerName) => {
       console.log(message);
-      setYou(newPlayerColor)
+      // setYou(newPlayerColor)
+      setLocalPlayer({ name: newPlayerName, color: newPlayerColor })
       setInGame(true)
     })
 
-    socket.on('set-players', playersFromSocket => {
+    socket.on('set-players', (playersFromSocket) => {
+      console.log('playersFromSocket', playersFromSocket)
       setPlayersInGame(playersFromSocket)
     })
 
@@ -84,6 +90,12 @@ const Game = () => {
       setPlacedPieces(game.placedPieces)
       countScore(game.gameState)
       checkValidMoves(game.gameState, game.placedPieces, game.currentPlayer)
+    })
+
+    socket.on('enter-name', message => {
+      console.log(message)
+      const newName = prompt('please enter name')
+      socket.emit('join-game', gameId, newName)
     })
 
     // Display message if opponent is disconnected
@@ -111,9 +123,9 @@ const Game = () => {
   }, [socket])
 
   useEffect(() => {
-    if (!you) return
-    console.log('You are:', you);
-  }, [you])
+    if (!localPlayer.color) return
+    console.log('You are:', localPlayer.color);
+  }, [localPlayer.color])
 
   const handleQuitGameClick = () => {
     socket.disconnect()
@@ -252,7 +264,7 @@ const Game = () => {
   }, [gameBoardState])
 
   const handleGameSquareClick = async (i) => {
-    if (you !== currentPlayer) return
+    if (localPlayer.color !== currentPlayer) return
     console.log(i)
     // Return if clicked square is not in currentValidMoves
     if (!currentValidMoves[i]) return;
