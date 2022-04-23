@@ -43,7 +43,6 @@ const Game = () => {
     setGameBoardState(initialGameBoardState)
     setCurrentPlayer('B')
     setPlacedPieces([39, 40, 48, 49])
-    setGameMsg('Black\'s turn')
     setCurrentValidMoves({})
     setGameOver(false)
     setScore({ white: 2, black: 2 })
@@ -69,8 +68,12 @@ const Game = () => {
     console.log('SCORE', score)
   }, [score])
 
+
   useEffect(() => {
     console.log('localPlayer', localPlayer)
+    if (localPlayer.color) {
+      setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\'s turn')
+    }
   }, [localPlayer])
 
   useEffect(() => {
@@ -134,22 +137,24 @@ const Game = () => {
 
     socket.on('sender-reset', playerData => {
       console.log('playerData', playerData)
-      setLocalPlayer({ 
-          name: playerData.name, 
-          opponent: playerData.opponent, 
-          color: playerData.color,
-          number: playerData.number,
+      setLocalPlayer({
+        name: playerData.name,
+        opponent: playerData.opponent,
+        color: playerData.color,
+        number: playerData.number,
       })
+      setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\s turn')
       console.log('You reset the game', playerData)
     })
 
     socket.on('opponent-reset', playerData => {
-      setLocalPlayer({ 
-        name: playerData.name, 
-        opponent: playerData.opponent, 
+      setLocalPlayer({
+        name: playerData.name,
+        opponent: playerData.opponent,
         color: playerData.color,
         number: playerData.number,
-    })
+      })
+      setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\s turn')
       console.log('Opponent reset the game', playerData)
     })
 
@@ -257,7 +262,9 @@ const Game = () => {
   // Check valid moves for the new player
   useEffect(() => {
     setSquareClicked(null)
-    setGameMsg(`${playerNames[currentPlayer]}'s turn`)
+    if (localPlayer.color) {
+      setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\s turn')
+    }
     checkValidMoves(gameBoardState, placedPieces, currentPlayer)
   }, [currentPlayer])
 
@@ -377,9 +384,26 @@ const Game = () => {
     )
   }
 
+  const renderScore = color => {
+    if (color === 'B') return (
+      <>
+        <div className={styles.scoreBlack}></div>
+        <span className={styles.scoreX}>x</span>
+        <span className={styles.scoreNumber}>{score.black}</span>
+      </>
+    )
+    if (color === 'W') return (
+      <>
+        <div className={styles.scoreWhite}></div>
+        <span className={styles.scoreX}>x</span>
+        <span className={styles.scoreNumber}>{score.white}</span>
+      </>
+    )
+  }
+
   return (
     <>
-      {playersInGame.length < 2 && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick}/>}
+      {playersInGame.length < 2 && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
       <div className={styles.gameId}>
         <p>Game ID:</p>
         <span ref={gameIdRef}>{gameId}</span>
@@ -391,30 +415,32 @@ const Game = () => {
             <div className={styles.winsWrapper}>
               <span>0</span>
             </div>
-            { localPlayer.number === 1 && 
-              <span>{ localPlayer.name ? localPlayer.name.toUpperCase() : "N / A" }</span>
-              }
-            { localPlayer.number === 2 && 
-              <span>{ localPlayer.opponent ? localPlayer.opponent.toUpperCase() : "N / A" }</span>
-              }
-            <div className={styles.scoreBlack}></div>
-            <span className={styles.scoreX}>x</span>
-            <span className={styles.scoreNumber}>{score.black}</span>
+            {localPlayer.number === 1 &&
+              <span>{localPlayer.name ? localPlayer.name.toUpperCase() : "N / A"}</span>
+            }
+            {localPlayer.number === 2 &&
+              <span>{localPlayer.opponent ? localPlayer.opponent.toUpperCase() : "N / A"}</span>
+            }
+            {localPlayer.color && localPlayer.number === 1 &&
+              renderScore(localPlayer.color)}
+            {localPlayer.color && localPlayer.number === 2 &&
+              renderScore(localPlayer.color === 'B' ? 'W' : 'B')}
           </div>
           <div className={styles.scoreDivider}></div>
           <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
             <div className={styles.winsWrapper}>
               <span>1</span>
             </div>
-            { localPlayer.number === 2 && 
-              <span>{ localPlayer.name ? localPlayer.name.toUpperCase() : "N / A" }</span>
-              }
-            { localPlayer.number === 1 && 
-              <span>{ localPlayer.opponent ? localPlayer.opponent.toUpperCase() : "N / A" }</span>
-              }
-            <div className={styles.scoreWhite}></div>
-            <span className={styles.scoreX}>x</span>
-            <span className={styles.scoreNumber}>{score.white}</span>
+            {localPlayer.number === 2 &&
+              <span>{localPlayer.name ? localPlayer.name.toUpperCase() : "N / A"}</span>
+            }
+            {localPlayer.number === 1 &&
+              <span>{localPlayer.opponent ? localPlayer.opponent.toUpperCase() : "N / A"}</span>
+            }
+            {localPlayer.color && localPlayer.number === 2 &&
+              renderScore(localPlayer.color)}
+            {localPlayer.color && localPlayer.number === 1 &&
+              renderScore(localPlayer.color === 'B' ? 'W' : 'B')}
           </div>
         </div>
 
@@ -457,9 +483,9 @@ const Game = () => {
             <button onClick={handleResetGameClick}>PLAY AGAIN</button>
           </div>
         }
-          <div className={styles.playAgainBtnWrapper}>
-            <button onClick={handleResetGameClick}>PLAY AGAIN</button>
-          </div>
+        <div className={styles.playAgainBtnWrapper}>
+          <button onClick={handleResetGameClick}>PLAY AGAIN</button>
+        </div>
       </div>
     </>
   )

@@ -39,7 +39,7 @@ io.on('connection', socket => {
     
     // Check if game id exists
     // Create new game or send existing game state to client
-    if (!activeGames[gameId]) activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B'}
+    if (!activeGames[gameId]) activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B' }
     if (activeGames[gameId] && activeGames[gameId].gameState.length) {
       socket.emit('get-game-state', activeGames[gameId])
     }
