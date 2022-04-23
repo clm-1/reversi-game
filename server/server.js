@@ -46,11 +46,12 @@ io.on('connection', socket => {
     
     // Find other players in game and set color to the available color
     const newPlayerColor = playersInGame.length && playersInGame[0]?.color === 'B' ? 'W' : 'B'
-    activePlayers.push({ player: socket.id, name: newPlayerName, gameId, color: newPlayerColor, opponent })
+    const newPlayerNumber = playersInGame.length && playersInGame[0].number === 1 ? 2 : 1
+    activePlayers.push({ player: socket.id, name: newPlayerName, gameId, color: newPlayerColor, opponent, number: newPlayerNumber })
     playersInGame = activePlayers.filter(player => player.gameId === gameId)
     // console.log('playersInGame', playersInGame)
-    socket.emit('game-joined', `Joined game as: ${newPlayerColor}: ${newPlayerName}`, newPlayerColor, newPlayerName)
-    io.in(gameId).emit('set-players', playersInGame)
+    socket.emit('game-joined', `Joined game as: ${newPlayerColor}`, newPlayerColor, newPlayerName, newPlayerNumber)
+    io.in(gameId).emit('set-players', playersInGame )
   })
 
   socket.on('new-name', newName => {
@@ -66,7 +67,19 @@ io.on('connection', socket => {
 
   socket.on('reset-game', (gameId) => {
     console.log('game', gameId);
+    // Change colors of players in game
+    let playersInGame = activePlayers.filter(player => player.gameId === gameId)
+    activePlayers = activePlayers.filter(player => player.gameId !== gameId)
+    playersInGame.forEach(player => {
+      player.color = player.color === 'B' ? 'W' : 'B'
+      activePlayers.push(player)
+    })
     activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B'}
+
+    const currentPlayer = playersInGame.filter(player => player.player === socket.id)
+    socket.emit('sender-reset', currentPlayer[0])
+    const opposingPlayer = playersInGame.filter(player => player.player !== socket.id)
+    socket.broadcast.emit('opponent-reset', opposingPlayer[0])
     io.in(gameId).emit('reset-game')
   })
 

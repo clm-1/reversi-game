@@ -11,7 +11,9 @@ const GameContextProvider = ({ children }) => {
   // Set the local player
   const [localPlayer, setLocalPlayer] = useState({
     name: '',
-    color: ''
+    color: '',
+    opponent: '',
+    number: 1,
   })
   // const [socket, setSocket] = useState(null)
   // const [game, setGame] = useState(null)
