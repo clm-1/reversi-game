@@ -8,6 +8,10 @@
   padding-top: 2rem;
 }
 
+.disabledGameWrapper {
+  pointer-events: none;
+}
+
 .gameId {
   position: absolute;
   display: flex;
@@ -50,7 +54,7 @@
   align-items: center;
   height: 100%;
   width: 100%;
-  margin-left: 1rem;
+  /* margin-left: 1rem; */
 }
 
 .scoreBoard {
@@ -125,6 +129,11 @@
   display: grid;
   gap: clamp(.05rem, calc(.1rem + .5vw), .3rem);
   grid-template-columns: repeat(8, 1fr);
+}
+
+.gameBoardDisabled {
+  opacity: .7;
+  pointer-events: none;
 }
 
 .gameSquare {
@@ -229,17 +238,21 @@
 
 .gameBtnWrapper {
   /* width: 70%; */
-  max-width: 220px;
+  /* max-width: 220px; */
+  display: flex;
   margin-top: calc(.7rem + .7vw);
   margin-bottom: 2rem;
   text-align: center;
+  gap: .7rem;
 }
 
 .gameBtnWrapper button {
   font-size: clamp(.5rem, calc(.5rem + 1vw), .9rem);
   background: none;
-  padding: clamp(.5rem, calc(.5rem + 2vw), 1rem) clamp(1rem, calc(1rem + 4.5vw), 3rem);
-  width: 100%;
+  padding: .8rem;
+  min-width: 110px;
+  /* padding: clamp(.5rem, calc(.5rem + 2vw), 1rem) clamp(1rem, calc(1rem + 4.5vw), 3rem); */
+  /* width: 100%; */
   border-radius: 15px;
 }
 
@@ -325,5 +338,14 @@
 @media screen and (min-width: 500px) {
   .playerScore {
     gap: .8rem;
+  }
+
+  .gameBtnWrapper {
+    gap: 1rem;
+  }
+  
+  .gameBtnWrapper button {
+    padding: 1rem;
+    min-width: 150px;
   }
 }

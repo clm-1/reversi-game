@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { io } from 'socket.io-client'
+import EnterName from '../components/EnterName'
 import WaitingForPlayer from '../components/WaitingForPlayer'
 import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Game.module.css'
@@ -10,7 +11,10 @@ const Game = () => {
   const { setInGame, playerNames, localPlayer, setLocalPlayer } = useGameContext()
   // const [you, setYou] = useState(null)
   const [currentPlayer, setCurrentPlayer] = useState('B')
+  const [blackPos, setBlackPos] = useState(1)
   const [playersInGame, setPlayersInGame] = useState([])
+  const [enterName, setEnterName] = useState(false)
+  const [wins, setWins] = useState([0, 0])
   const [gameOver, setGameOver] = useState(false)
   const { gameId } = useParams()
   const [socket, setSocket] = useState()
@@ -47,19 +51,22 @@ const Game = () => {
     setGameOver(false)
     setScore({ white: 2, black: 2 })
     checkValidMoves(initialGameBoardState, [39, 40, 48, 49], 'B')
+    setGameBoardMsg('New game, switching player colors')
+    setTimeout(() => {
+      setGameBoardMsg(null)
+    }, 4500)
   }
 
   // Set up socket connection
   useEffect(() => {
     // const s = io(import.meta.env.VITE_BACKEND_URL)
-    const s = io('http://localhost:3001')
+    const s = io('http://localhost:3001', {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    })
     setSocket(s)
-
-    // Might need to save socket in context
-    // setGame(gameId)
-    // return () => {
-    //   closeSocket()
-    // }
   }, [])
 
   useEffect(() => {
@@ -90,26 +97,31 @@ const Game = () => {
 
     socket.on('set-players', (playersFromSocket) => {
       console.log('playersFromSocket', playersFromSocket)
-      // if (playersFromSocket.length === 2) {
-      //   const opponent = playersFromSocket.filter(player => player.name !== localPlayer.name)
-      //   console.log('opponent:', localPlayer.name)
-      // }
       setPlayersInGame(playersFromSocket)
     })
 
     socket.on('get-game-state', game => {
       console.log('getting game state:', game);
       setGameBoardState(game.gameState)
-      setCurrentPlayer(game.currentPlayer)
+      if (!game.gameOver) setCurrentPlayer(game.currentPlayer)
       setPlacedPieces(game.placedPieces)
       countScore(game.gameState)
-      checkValidMoves(game.gameState, game.placedPieces, game.currentPlayer)
+      setGameOver(game.gameOver)
+      if (!game.gameOver) checkValidMoves(game.gameState, game.placedPieces, game.currentPlayer)
     })
 
+    socket.on('get-initial-states', (newBlackPos, newWins) => {
+      setBlackPos(newBlackPos)
+      console.log('WINS', newWins)
+      setWins(newWins)
+    })
+
+    // Prompt user to enter name if none is found on server
     socket.on('enter-name', message => {
       console.log(message)
-      const newName = prompt('please enter name')
-      socket.emit('join-game', gameId, newName)
+      setEnterName(true)
+      // const newName = prompt('please enter name')
+      // socket.emit('join-game', gameId, newName)
     })
 
     // Display message if opponent is disconnected
@@ -130,9 +142,10 @@ const Game = () => {
       setGameBoardState(gameState)
     })
 
-    socket.on('reset-game', () => {
+    socket.on('reset-game', (blackPos) => {
       console.log('reset!!!!');
       resetGame()
+      setBlackPos(blackPos)
     })
 
     socket.on('sender-reset', playerData => {
@@ -163,7 +176,8 @@ const Game = () => {
   useEffect(() => {
     let opponent = 'not joined'
     if (playersInGame.length === 2) {
-      opponent = playersInGame.filter(player => player.name !== localPlayer.name)[0].name
+      opponent = playersInGame.filter(player => player.name !== localPlayer.name)[0]?.name
+      if (!opponent) opponent = localPlayer.name
       setLocalPlayer({ ...localPlayer, opponent })
     }
   }, [playersInGame])
@@ -173,10 +187,19 @@ const Game = () => {
     console.log('You are:', localPlayer.color);
   }, [localPlayer.color])
 
+  useEffect(() => {
+    console.log('blackPos', blackPos)
+  }, [blackPos])
+
   const handleQuitGameClick = () => {
     socket.disconnect()
     // socket.emit('leave-game')
     navigate('/')
+  }
+
+  const handleSetNameClick = (newName) => {
+    socket.emit('join-game', gameId, newName)
+    setEnterName(false)
   }
 
   // Count score after each move
@@ -189,6 +212,7 @@ const Game = () => {
     const leader = playerNames[newScore.white > newScore.black ? 'W' : 'B']
     console.log(`leader`, leader)
     setScore(newScore)
+    return newScore
   }
 
   // Check valid moves for the current player (runs when current player changes)
@@ -247,7 +271,7 @@ const Game = () => {
 
     // If there are no valid moves (show message and change current player)
     if (!Object.keys(validMoves).length) {
-      setGameBoardMsg(`${playerNames[currentPlayer]} has no moves...`)
+      if (!gameOver) setGameBoardMsg(`${playerNames[currentPlayer]} has no moves...`)
       setTimeout(() => {
         setGameBoardMsg(null)
         setNewMsg(true);
@@ -262,20 +286,53 @@ const Game = () => {
   // Check valid moves for the new player
   useEffect(() => {
     setSquareClicked(null)
-    if (localPlayer.color) {
-      setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\s turn')
+    if (!gameOver) {
+      if (localPlayer.color) {
+        setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\s turn')
+      }
+      checkValidMoves(gameBoardState, placedPieces, currentPlayer)
     }
-    checkValidMoves(gameBoardState, placedPieces, currentPlayer)
   }, [currentPlayer])
 
-  const endGame = () => {
-    let outcome = `${playerNames[score.white > score.black ? 'W' : 'B']} wins!`
-    if (score.white === score.black) outcome = 'Draw!'
+  const printGameOverMsg = (score) => {
+    let msg = 'You win!'
+    if (localPlayer.color && localPlayer.color === 'B') {
+      if (score.black > score.white) msg = 'You win!'
+      else msg = 'Opponent wins!'
+    }
+    if (localPlayer.color && localPlayer.color === 'W') {
+      if (score.white > score.black) msg = 'You win!'
+      else msg = 'Opponent wins!'
+    }
+    if (score.white === score.black) msg = 'Draw!'
+    return msg.toUpperCase()
+  }
+
+  const getWinner = (score) => {
+    let winner;
+    if (score.white === score.black) winner = 'draw'
+    if (!winner) winner = score.black > score.white ? 'B' : 'W'
+    let winnerNumber;
+    if (localPlayer.color && localPlayer.color === winner) {
+      winnerNumber = localPlayer.number
+    } else {
+      winnerNumber = localPlayer.number === 1 ? 2 : 1
+    }
+    return winnerNumber
+  }
+
+  const endGame = (score) => {
+    console.log('score at end game function', score) // one count behind!
+    let outcome = printGameOverMsg(score)
     setGameMsg(outcome)
     setGameBoardMsg(outcome)
     setCurrentValidMoves({})
+    let tempWins = wins
+    tempWins[getWinner(score) - 1]++
+    setWins(tempWins)
+    socket.emit('set-game-over', gameId, tempWins)
+    setGameOver(true)
     setTimeout(() => {
-      setGameOver(true)
       setGameBoardMsg(null)
     }, 4500)
   }
@@ -294,25 +351,25 @@ const Game = () => {
 
       if (!moveToMake.current.piecesToChange.length) {
         moveToMake.current = null;
-        countScore(tempGameStateArray)
+        let newScore = countScore(tempGameStateArray)
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
-        socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W')
+        socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
         console.log('empty', emptySquares)
-        if (emptySquares !== 0) {
+        if (emptySquares > 55) {
           setTimeout(() => {
             setNewMsg(true);
             setTimeout(() => { setNewMsg(false) }, 1500)
             setCurrentPlayer(currentPlayer === 'W' ? 'B' : 'W')
           }, 1400);
         } else {
-          endGame()
+          endGame(newScore)
         }
       }
     }
   }, [gameBoardState])
 
   const handleGameSquareClick = async (i) => {
-    if (localPlayer.color !== currentPlayer) return
+    if (gameOver || (localPlayer.color !== currentPlayer)) return
     console.log(i)
     // Return if clicked square is not in currentValidMoves
     if (!currentValidMoves[i]) return;
@@ -401,19 +458,33 @@ const Game = () => {
     )
   }
 
+  const setCurrentPlayerStyle = (num) => {
+    let activePos = null
+    if (gameOver) return ''
+    if (blackPos === 1) {
+      activePos = currentPlayer === 'B' ? 1 : 2
+    }
+    if (blackPos === 2) {
+      activePos = currentPlayer === 'B' ? 2 : 1
+    }
+    if (activePos === num) return styles.currentPlayer
+    else return ''
+  }
+
   return (
     <>
-      {playersInGame.length < 2 && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
+      {playersInGame.length < 2 && !enterName && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
+      {enterName && <EnterName handleQuitGameClick={handleQuitGameClick} handleSetNameClick={handleSetNameClick} />}
       <div className={styles.gameId}>
         <p>Game ID:</p>
         <span ref={gameIdRef}>{gameId}</span>
         <button onClick={() => handleGameIdClick(gameIdRef.current?.innerText)}><i className="fas fa-paste"></i></button>
       </div>
-      <div className={`${styles.gameWrapper} ${roomFull ? styles.roomFull : ''}`}>
+      <div className={`${styles.gameWrapper} ${roomFull ? styles.roomFull : ''} ${gameBoardMsg ? styles.disabledGameWrapper : ''}`}>
         <div className={`${styles.scoreBoard}`}>
-          <div className={`${styles.playerScore} ${currentPlayer === 'B' ? styles.currentPlayer : ''}`}>
+          <div className={`${styles.playerScore} ${setCurrentPlayerStyle(1)}`}>
             <div className={styles.winsWrapper}>
-              <span>0</span>
+              <span>{wins && wins[0]}</span>
             </div>
             {localPlayer.number === 1 &&
               <span>{localPlayer.name ? localPlayer.name.toUpperCase() : "N / A"}</span>
@@ -427,9 +498,9 @@ const Game = () => {
               renderScore(localPlayer.color === 'B' ? 'W' : 'B')}
           </div>
           <div className={styles.scoreDivider}></div>
-          <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
+          <div className={`${styles.playerScore} ${setCurrentPlayerStyle(2)}`}>
             <div className={styles.winsWrapper}>
-              <span>1</span>
+              <span>{wins && wins[1]}</span>
             </div>
             {localPlayer.number === 2 &&
               <span>{localPlayer.name ? localPlayer.name.toUpperCase() : "N / A"}</span>
@@ -445,7 +516,7 @@ const Game = () => {
         </div>
 
         {gameBoardState?.length &&
-          <div className={styles.gameBoardWrapper}>
+          <div className={`${styles.gameBoardWrapper} ${gameOver ? styles.gameBoardDisabled : ''}`}>
             {renderGameBoard()}
           </div>}
 
@@ -462,30 +533,28 @@ const Game = () => {
           </div> */}
 
           <div className={`${styles.gameMessageWrapper}`}>
-            <p className={newMsg ? styles.newMsg : ''}>{gameMsg.toUpperCase()}</p>
+            {!gameOver && <p className={newMsg ? styles.newMsg : ''}>{gameMsg.toUpperCase()}</p>}
+            {gameOver && score && <p className={newMsg ? styles.newMsg : ''}>
+              {printGameOverMsg(score)}
+            </p>}
           </div>
 
           {/* <hr className={styles.gameHr} /> */}
 
           <div className={styles.gameBtnWrapper}>
+            { gameOver &&
+              <button className="outlined" onClick={handleResetGameClick}>PLAY AGAIN</button>
+            }
             <button className="outlined" onClick={handleQuitGameClick}>QUIT GAME</button>
           </div>
+
         </div>
 
         {gameBoardMsg &&
           <div className={styles.gameBoardMessage}>
-            <p>{gameBoardMsg}</p>
+            <p>{gameBoardMsg.toUpperCase()}</p>
           </div>
         }
-
-        {gameOver &&
-          <div className={styles.playAgainBtnWrapper}>
-            <button onClick={handleResetGameClick}>PLAY AGAIN</button>
-          </div>
-        }
-        <div className={styles.playAgainBtnWrapper}>
-          <button onClick={handleResetGameClick}>PLAY AGAIN</button>
-        </div>
       </div>
     </>
   )

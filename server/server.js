@@ -2,7 +2,12 @@ const io = require('socket.io')(process.env.PORT || 3001, {
   cors: {
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST']
-  }
+  },
+  pingInterval: 25000,
+  pintTimeout: 30000,
+  upgradeTimeout: 20000,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
 })
 
 let activePlayers = []
@@ -39,9 +44,10 @@ io.on('connection', socket => {
     
     // Check if game id exists
     // Create new game or send existing game state to client
-    if (!activeGames[gameId]) activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B' }
-    if (activeGames[gameId] && activeGames[gameId].gameState.length) {
-      socket.emit('get-game-state', activeGames[gameId])
+    if (!activeGames[gameId]) activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B', blackPos: 1, gameOver: false, wins: [0, 0] }
+    if (activeGames[gameId]) {
+      socket.emit('get-initial-states', activeGames[gameId].blackPos, activeGames[gameId].wins)
+      if (activeGames[gameId].gameState.length) socket.emit('get-game-state', activeGames[gameId])
     }
     
     // Find other players in game and set color to the available color
@@ -54,15 +60,16 @@ io.on('connection', socket => {
     io.in(gameId).emit('set-players', playersInGame )
   })
 
-  socket.on('new-name', newName => {
-    
-  })
-
-  socket.on('set-game-state', (gameState, placedPieces, currentPlayer )=> {
+  socket.on('set-game-state', (gameState, placedPieces, currentPlayer, blackPos, gameOver, wins ) => {
     // Take a look at this later, add error handling
     console.log('activePlayers', activePlayers)
     const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
-    activeGames[game] = { gameState, placedPieces, currentPlayer }
+    activeGames[game] = { gameState, placedPieces, currentPlayer, blackPos, gameOver, wins }
+  })
+
+  socket.on('set-game-over', (gameId, wins) => {
+    activeGames[gameId].gameOver = true
+    activeGames[gameId].wins = wins
   })
 
   socket.on('reset-game', (gameId) => {
@@ -74,13 +81,13 @@ io.on('connection', socket => {
       player.color = player.color === 'B' ? 'W' : 'B'
       activePlayers.push(player)
     })
-    activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B'}
+    activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B', blackPos: activeGames[gameId].blackPos === 1 ? 2 : 1, gameOver: false, wins: activeGames[gameId].wins }
 
     const currentPlayer = playersInGame.filter(player => player.player === socket.id)
     socket.emit('sender-reset', currentPlayer[0])
     const opposingPlayer = playersInGame.filter(player => player.player !== socket.id)
     socket.broadcast.emit('opponent-reset', opposingPlayer[0])
-    io.in(gameId).emit('reset-game')
+    io.in(gameId).emit('reset-game', activeGames[gameId].blackPos)
   })
 
   socket.on('disconnect', (reason) => {
