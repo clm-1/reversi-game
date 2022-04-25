@@ -8,6 +8,7 @@ const io = require('socket.io')(process.env.PORT || 3001, {
   upgradeTimeout: 20000,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
+  transports: ['websocket', 'polling']
 })
 
 let activePlayers = []
@@ -60,11 +61,14 @@ io.on('connection', socket => {
     io.in(gameId).emit('set-players', playersInGame )
   })
 
-  socket.on('set-game-state', (gameState, placedPieces, currentPlayer, blackPos, gameOver, wins ) => {
-    // Take a look at this later, add error handling
-    console.log('activePlayers', activePlayers)
-    const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
-    activeGames[game] = { gameState, placedPieces, currentPlayer, blackPos, gameOver, wins }
+  socket.on('set-game-state', (gameId, gameState, placedPieces, currentPlayer, blackPos, gameOver, wins ) => {
+    try {
+      // Take a look at this later, add error handling
+    // const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
+    activeGames[gameId] = { gameState, placedPieces, currentPlayer, blackPos, gameOver, wins }
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   socket.on('set-game-over', (gameId, wins) => {
