@@ -304,12 +304,14 @@ const Game = () => {
     }
 
     // Set the valid moves available to the player
+    setNoMoves(0)
     setCurrentValidMoves(validMoves)
   }
 
+  // Check for no moves, end game if there are no moves for both players
   useEffect(() => {
     console.log('noMoves', noMoves)
-    if (noMoves === 2) {
+    if (noMoves > 2) {
       console.log('end game here')
       setNoMoves(0)
       endGame(score)
@@ -360,13 +362,19 @@ const Game = () => {
     console.log('game board state change')
     if (moveToMake.current && moveToMake.current.piecesToChange.length) {
       let tempGameStateArray = [...gameBoardState]
-      // moveToMake.current.piecesToChange.forEach(index => tempGameStateArray[index] = currentPlayer)
-      console.log('place:', moveToMake.current.piecesToChange[0])
-      tempGameStateArray[moveToMake.current.piecesToChange[0]] = currentPlayer
-      moveToMake.current.piecesToChange.shift()
-      setTimeout(() => {
-        setGameBoardState(tempGameStateArray)
-      }, 0)
+
+      // Use this to change all pieces at once
+      moveToMake.current.piecesToChange.forEach(index => tempGameStateArray[index] = currentPlayer)
+      moveToMake.current.piecesToChange = []
+      setGameBoardState(tempGameStateArray)
+
+      // Use this to change one piece at a time
+      // console.log('place:', moveToMake.current.piecesToChange[0])
+      // tempGameStateArray[moveToMake.current.piecesToChange[0]] = currentPlayer
+      // moveToMake.current.piecesToChange.shift()
+      // setTimeout(() => {
+      //   setGameBoardState(tempGameStateArray)
+      // }, 0)
 
       if (!moveToMake.current.piecesToChange.length) {
         moveToMake.current = null;
