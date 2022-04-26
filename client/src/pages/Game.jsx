@@ -47,7 +47,7 @@ const Game = () => {
   const resetGame = () => {
     setGameBoardMsg('starting new game...')
     setTimeout(() => {
-      setGameBoardMsg('switched player colors')
+      setGameBoardMsg('switching player colors')
     }, 1500)
     setTimeout(() => {
       setGameBoardState(initialGameBoardState)
@@ -294,11 +294,19 @@ const Game = () => {
     let movesList = Object.keys(validMoves)
     // movesList = []
     if (!movesList.length) {
-      if (!gameOver) setGameBoardMsg(`${playerNames[currentPlayer]} has no moves...`)
+      if (!gameOver) {
+        let noMovesMsg = ''
+        if (localPlayer.color && localPlayer.color === currentPlayer) {
+          noMovesMsg = 'You have no moves...'
+        } else noMovesMsg = 'Opponent has no moves...'
+        setGameBoardMsg(noMovesMsg)
+      }
+
       setTimeout(() => {
         setGameBoardMsg(null)
         setNoMoves(noMoves + 1)
         setNewMsg(true);
+        setTimeout(() => { setNewMsg(false) }, 1500)
         setCurrentPlayer(currentPlayer === 'W' ? 'B' : 'W')
       }, 4500)
     }
@@ -311,7 +319,7 @@ const Game = () => {
   // Check for no moves, end game if there are no moves for both players
   useEffect(() => {
     console.log('noMoves', noMoves)
-    if (noMoves > 2) {
+    if (noMoves >= 2) {
       console.log('end game here')
       setNoMoves(0)
       endGame(score)
