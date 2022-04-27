@@ -46,6 +46,7 @@ const Game = () => {
 
   const resetGame = () => {
     setGameBoardMsg('starting new game...')
+    setScore({ white: 2, black: 2 })
     setTimeout(() => {
       setGameBoardMsg('switching player colors')
     }, 1500)
@@ -55,7 +56,6 @@ const Game = () => {
       setPlacedPieces([39, 40, 48, 49])
       setCurrentValidMoves({})
       setGameOver(false)
-      setScore({ white: 2, black: 2 })
       checkValidMoves(initialGameBoardState, [39, 40, 48, 49], 'B')
       setGameBoardMsg(null)
     }, 4500)
@@ -77,8 +77,6 @@ const Game = () => {
 
   useEffect(() => {
     let outcome = `${playerNames[score.white > score.black ? 'W' : 'B']} wins!`
-    console.log('LEADER:', outcome)
-    console.log('SCORE', score)
   }, [score])
 
 
@@ -95,7 +93,7 @@ const Game = () => {
     socket.emit('join-game', { gameId, newPlayerName: localPlayer.name })
 
     socket.on('game-joined', ({ msg, newPlayerColor, newPlayerName, newPlayerNumber }) => {
-      console.log(msg, newPlayerColor, newPlayerName, newPlayerNumber);
+      console.log(msg);
       setLocalPlayer({ name: newPlayerName, color: newPlayerColor, number: newPlayerNumber })
       setInGame(true)
     })
@@ -118,13 +116,11 @@ const Game = () => {
     socket.on('get-initial-states', (newBlackPos, newWins) => {
       console.log('initial states', newBlackPos, newWins)
       setBlackPos(newBlackPos)
-      console.log('WINS', newWins)
       setWins(newWins)
     })
 
     // Prompt user to enter name if none is found on server
     socket.on('enter-name', message => {
-      console.log(message)
       setEnterName(true)
     })
 
@@ -152,7 +148,6 @@ const Game = () => {
     })
 
     socket.on('sender-reset', playerData => {
-      console.log('playerData', playerData)
       setLocalPlayer({
         name: playerData.name,
         opponent: playerData.opponent,
@@ -219,7 +214,6 @@ const Game = () => {
   }
 
   const endGame = (score) => {
-    console.log('score at end game function', score) // one count behind!
     let outcome = printGameOverMsg(score)
     setGameMsg(outcome)
     setGameBoardMsg(outcome)
@@ -317,7 +311,6 @@ const Game = () => {
 
   // Check for no moves, end game if there are no moves for both players
   useEffect(() => {
-    console.log('noMoves', noMoves)
     if (noMoves >= 2) {
       console.log('end game here')
       setNoMoves(0)
@@ -366,7 +359,6 @@ const Game = () => {
   }
 
   useEffect(() => {
-    console.log('game board state change')
     if (moveToMake.current && moveToMake.current.piecesToChange.length) {
       let tempGameStateArray = [...gameBoardState]
 
@@ -388,7 +380,6 @@ const Game = () => {
         let newScore = countScore(tempGameStateArray)
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        console.log('empty', emptySquares)
         if (emptySquares !== 0) {
           setTimeout(() => {
             setNewMsg(true);
@@ -404,7 +395,7 @@ const Game = () => {
 
   const handleGameSquareClick = async (i) => {
     if (gameOver || (localPlayer.color !== currentPlayer)) return
-    console.log(i)
+
     // Return if clicked square is not in currentValidMoves
     if (!currentValidMoves[i]) return;
     if (squareClicked) return
@@ -414,9 +405,6 @@ const Game = () => {
       piecesToChange: [...currentValidMoves[i]]
     }
     let test = moveToMake.current.piecesToChange.join(' ')
-    console.log('test', test)
-    console.log()
-    console.log('move to make:', moveToMake.current)
 
     let tempGameStateArray = [...gameBoardState]
     tempGameStateArray[i] = currentPlayer
@@ -507,7 +495,7 @@ const Game = () => {
 
   return (
     <>
-      {playersInGame && playersInGame.length < 2 && !enterName && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
+      {playersInGame && playersInGame.length < 2 && !enterName && !roomFull && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
       {enterName && <EnterName handleQuitGameClick={handleQuitGameClick} handleSetNameClick={handleSetNameClick} />}
       <div className={styles.gameId}>
         <p>Game ID:</p>
