@@ -18,8 +18,9 @@ const activeGames = {}
 io.on('connection', socket => {
   console.log('connection made');
   socket.emit('connection-made', { msg: 'hello' })
-  socket.on('join-game', (gameId, newPlayerName) => {
+  socket.on('join-game', ({ gameId, newPlayerName }) => {
     const players = io.sockets.adapter.rooms.get(gameId)
+    console.log(newPlayerName, gameId)
     const numOfPlayers = players ? players.size : 0
     if (numOfPlayers >= 2) return io.to(socket.id).emit('room-full', 'room is full')
     let playersInGame = activePlayers.filter(player => player.gameId === gameId)

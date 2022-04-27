@@ -90,7 +90,8 @@ const Game = () => {
   useEffect(() => {
     if (socket == null) return
     console.log('socket', socket);
-    socket.emit('join-game', gameId, localPlayer.name)
+    const gameDetails = { gameId, newPlayerName: localPlayer.name }
+    socket.emit('join-game', { gameId, newPlayerName: localPlayer.name })
 
     socket.on('game-joined', (message, newPlayerColor, newPlayerName, newPlayerNumber) => {
       console.log(message);
@@ -388,7 +389,6 @@ const Game = () => {
         moveToMake.current = null;
         let newScore = countScore(tempGameStateArray)
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
-        console.log('setting game state', gameId, tempGameStateArray, placedPieces)
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
         console.log('empty', emptySquares)
         if (emptySquares !== 0) {
@@ -459,7 +459,6 @@ const Game = () => {
   }
 
   const renderGameBoard = () => {
-    console.log('gameBoardState', gameBoardState)
     if (gameBoardState && gameBoardState.length) return (
       gameBoardState.map((square, i) => {
         if (square === 'X') return
