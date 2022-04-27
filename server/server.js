@@ -57,15 +57,13 @@ io.on('connection', socket => {
     const newPlayerNumber = playersInGame.length && playersInGame[0].number === 1 ? 2 : 1
     activePlayers.push({ player: socket.id, name: newPlayerName, gameId: gameId, color: newPlayerColor, opponent: opponent, number: newPlayerNumber })
     playersInGame = activePlayers.filter(player => player.gameId === gameId)
-    // console.log('playersInGame', playersInGame)
+
     socket.emit('game-joined', { msg: `Joined game as: ${newPlayerColor}`, newPlayerColor, newPlayerName, newPlayerNumber })
-    console.log('sending players', playersInGame)
     io.in(gameId).emit('set-players', { players: playersInGame, test: 'hej' })
   })
 
   socket.on('set-game-state', (gameState, placedPieces, currentPlayer, blackPos, gameOver, wins) => {
     try {
-      // Take a look at this later, add error handling
       const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
       console.log('gameState on server', gameState)
       activeGames[game] = { gameState, placedPieces, currentPlayer, blackPos, gameOver, wins }
@@ -75,26 +73,34 @@ io.on('connection', socket => {
   })
 
   socket.on('set-game-over', (gameId, wins) => {
-    activeGames[gameId].gameOver = true
-    activeGames[gameId].wins = wins
+    try {
+      activeGames[gameId].gameOver = true
+      activeGames[gameId].wins = wins
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   socket.on('reset-game', (gameId) => {
-    console.log('game', gameId);
-    // Change colors of players in game
-    let playersInGame = activePlayers.filter(player => player.gameId === gameId)
-    activePlayers = activePlayers.filter(player => player.gameId !== gameId)
-    playersInGame.forEach(player => {
-      player.color = player.color === 'B' ? 'W' : 'B'
-      activePlayers.push(player)
-    })
-    activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B', blackPos: activeGames[gameId].blackPos === 1 ? 2 : 1, gameOver: false, wins: activeGames[gameId].wins }
+    try {
+      console.log('game', gameId);
+      // Change colors of players in game
+      let playersInGame = activePlayers.filter(player => player.gameId === gameId)
+      activePlayers = activePlayers.filter(player => player.gameId !== gameId)
+      playersInGame.forEach(player => {
+        player.color = player.color === 'B' ? 'W' : 'B'
+        activePlayers.push(player)
+      })
+      activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B', blackPos: activeGames[gameId].blackPos === 1 ? 2 : 1, gameOver: false, wins: activeGames[gameId].wins }
 
-    const currentPlayer = playersInGame.filter(player => player.player === socket.id)
-    socket.emit('sender-reset', currentPlayer[0])
-    const opposingPlayer = playersInGame.filter(player => player.player !== socket.id)
-    socket.broadcast.emit('opponent-reset', opposingPlayer[0])
-    io.in(gameId).emit('reset-game', activeGames[gameId].blackPos)
+      const currentPlayer = playersInGame.filter(player => player.player === socket.id)
+      socket.emit('sender-reset', currentPlayer[0])
+      const opposingPlayer = playersInGame.filter(player => player.player !== socket.id)
+      socket.broadcast.emit('opponent-reset', opposingPlayer[0])
+      io.in(gameId).emit('reset-game', activeGames[gameId].blackPos)
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   socket.on('disconnect', (reason) => {
@@ -113,7 +119,11 @@ io.on('connection', socket => {
   })
 
   socket.on('move-made', (move, gameState, newPlacedPieces) => {
-    const game = activePlayers.filter(player => player.player === socket.id)[0].gameId
-    socket.broadcast.to(game).emit('move-made', move, gameState, newPlacedPieces)
+    try {
+      const game = activePlayers.filter(player => player.player === socket.id)[0].gameId
+      socket.broadcast.to(game).emit('move-made', move, gameState, newPlacedPieces)
+    } catch (err) {
+      console.log(err)
+    }
   })
 })

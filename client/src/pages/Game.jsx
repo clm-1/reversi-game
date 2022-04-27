@@ -63,14 +63,14 @@ const Game = () => {
 
   // Set up socket connection
   useEffect(() => {
-    const s = io(import.meta.env.VITE_BACKEND_URL)
+    // const s = io(import.meta.env.VITE_BACKEND_URL)
 
-    // const s = io('http://localhost:3001', {
-    //   reconnection: true,
-    //   reconnectionAttempts: Infinity,
-    //   reconnectionDelay: 1000,
-    //   reconnectionDelayMax: 5000,
-    // })
+    const s = io('http://localhost:3001', {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    })
 
     setSocket(s)
   }, [])
@@ -96,13 +96,12 @@ const Game = () => {
 
     socket.on('game-joined', ({ msg, newPlayerColor, newPlayerName, newPlayerNumber }) => {
       console.log(msg, newPlayerColor, newPlayerName, newPlayerNumber);
-      // setYou(newPlayerColor)
       setLocalPlayer({ name: newPlayerName, color: newPlayerColor, number: newPlayerNumber })
       setInGame(true)
     })
 
-    socket.on('set-players', ({ players, test }) => {
-      console.log('playersFromSocket', players, test)
+    socket.on('set-players', ({ players }) => {
+      console.log('playersFromSocket', players)
       if (players && players.length) setPlayersInGame(players)
     })
 
@@ -117,6 +116,7 @@ const Game = () => {
     })
 
     socket.on('get-initial-states', (newBlackPos, newWins) => {
+      console.log('initial states', newBlackPos, newWins)
       setBlackPos(newBlackPos)
       console.log('WINS', newWins)
       setWins(newWins)
@@ -126,8 +126,6 @@ const Game = () => {
     socket.on('enter-name', message => {
       console.log(message)
       setEnterName(true)
-      // const newName = prompt('please enter name')
-      // socket.emit('join-game', gameId, newName)
     })
 
     // Display message if opponent is disconnected
@@ -149,7 +147,6 @@ const Game = () => {
     })
 
     socket.on('reset-game', (blackPos) => {
-      console.log('reset!!!!');
       resetGame()
       setBlackPos(blackPos)
     })
