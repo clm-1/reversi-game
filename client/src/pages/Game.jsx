@@ -100,9 +100,9 @@ const Game = () => {
       setInGame(true)
     })
 
-    socket.on('set-players', ( playersFromSocket ) => {
-      console.log('playersFromSocket', playersFromSocket)
-      setPlayersInGame(playersFromSocket?.playersInGame)
+    socket.on('set-players', ({ players, test }) => {
+      console.log('playersFromSocket', players, test)
+      if (players && players.length) setPlayersInGame(players)
     })
 
     socket.on('get-game-state', game => {
