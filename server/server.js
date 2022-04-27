@@ -58,7 +58,7 @@ io.on('connection', socket => {
     activePlayers.push({ player: socket.id, name: newPlayerName, gameId: gameId, color: newPlayerColor, opponent: opponent, number: newPlayerNumber })
     playersInGame = activePlayers.filter(player => player.gameId === gameId)
     // console.log('playersInGame', playersInGame)
-    socket.emit('game-joined', { 'msg': `Joined game as: ${newPlayerColor}`, 'newPlayerColor': newPlayerColor, 'newPlayerName': newPlayerName, 'newPlayerNumber': newPlayerNumber })
+    socket.emit('game-joined', {newPlayerName})
     console.log('sending players', playersInGame)
     io.in(gameId).emit('set-players', { players: playersInGame, test: 'hej'})
   })
