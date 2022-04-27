@@ -61,11 +61,12 @@ io.on('connection', socket => {
     io.in(gameId).emit('set-players', playersInGame )
   })
 
-  socket.on('set-game-state', (gameId, gameState, placedPieces, currentPlayer, blackPos, gameOver, wins ) => {
+  socket.on('set-game-state', (gameState, placedPieces, currentPlayer, blackPos, gameOver, wins ) => {
     try {
       // Take a look at this later, add error handling
-    // const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
-    activeGames[gameId] = { gameState, placedPieces, currentPlayer, blackPos, gameOver, wins }
+    const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
+    console.log('gameState on server', gameState)
+    activeGames[game] = { gameState, placedPieces, currentPlayer, blackPos, gameOver, wins }
     } catch (err) {
       console.log(err)
     }

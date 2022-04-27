@@ -388,7 +388,8 @@ const Game = () => {
         moveToMake.current = null;
         let newScore = countScore(tempGameStateArray)
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
-        socket.emit('set-game-state', gameId, tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
+        console.log('setting game state', gameId, tempGameStateArray, placedPieces)
+        socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
         console.log('empty', emptySquares)
         if (emptySquares !== 0) {
           setTimeout(() => {
@@ -458,7 +459,8 @@ const Game = () => {
   }
 
   const renderGameBoard = () => {
-    return (
+    console.log('gameBoardState', gameBoardState)
+    if (gameBoardState && gameBoardState.length) return (
       gameBoardState.map((square, i) => {
         if (square === 'X') return
         return (
