@@ -104,7 +104,8 @@ io.on('connection', socket => {
     socket.broadcast.to(game).emit('player-disconnected', socket.id)
     activePlayers = activePlayers.filter(player => player.player !== socket.id)
     const playersInGame = activePlayers.filter(player => player.gameId === game)
-    io.in(game).emit('set-players', playersInGame)
+    // io.in(game).emit('set-players', playersInGame)
+    io.in(gameId).emit('set-players', { players: playersInGame, test: 'hej'})
     if (!playersInGame.length) delete activeGames[game]
   })
 
