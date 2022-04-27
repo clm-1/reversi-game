@@ -59,7 +59,7 @@ io.on('connection', socket => {
     playersInGame = activePlayers.filter(player => player.gameId === gameId)
     // console.log('playersInGame', playersInGame)
     socket.emit('game-joined', `Joined game as: ${newPlayerColor}`, newPlayerColor, newPlayerName, newPlayerNumber)
-    io.in(gameId).emit('set-players', { playersInGame })
+    io.in(gameId).emit('set-players', { playersInGame } )
   })
 
   socket.on('set-game-state', (gameState, placedPieces, currentPlayer, blackPos, gameOver, wins ) => {

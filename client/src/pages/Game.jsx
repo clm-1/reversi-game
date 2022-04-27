@@ -100,9 +100,9 @@ const Game = () => {
       setInGame(true)
     })
 
-    socket.on('set-players', ({ playersInGame }) => {
-      console.log('playersFromSocket', playersInGame)
-      setPlayersInGame(playersInGame)
+    socket.on('set-players', ( playersFromSocket ) => {
+      console.log('playersFromSocket', playersFromSocket)
+      setPlayersInGame(playersFromSocket?.playersInGame)
     })
 
     socket.on('get-game-state', game => {
@@ -203,7 +203,7 @@ const Game = () => {
   }
 
   const handleSetNameClick = (newName) => {
-    socket.emit('join-game', { gameId, newPlayerName: newName })
+    socket.emit('join-game', gameId, newName)
     setEnterName(false)
   }
 
