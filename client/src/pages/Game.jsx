@@ -63,13 +63,15 @@ const Game = () => {
 
   // Set up socket connection
   useEffect(() => {
-    // const s = io(import.meta.env.VITE_BACKEND_URL)
-    const s = io('http://localhost:3001', {
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-    })
+    const s = io(import.meta.env.VITE_BACKEND_URL)
+
+    // const s = io('http://localhost:3001', {
+    //   reconnection: true,
+    //   reconnectionAttempts: Infinity,
+    //   reconnectionDelay: 1000,
+    //   reconnectionDelayMax: 5000,
+    // })
+
     setSocket(s)
   }, [])
 
@@ -102,7 +104,7 @@ const Game = () => {
 
     socket.on('set-players', ( playersFromSocket ) => {
       console.log('playersFromSocket', playersFromSocket)
-      setPlayersInGame(playersFromSocket?.playersInGame)
+      setPlayersInGame(playersFromSocket)
     })
 
     socket.on('get-game-state', game => {
