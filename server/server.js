@@ -55,11 +55,11 @@ io.on('connection', socket => {
     // Find other players in game and set color to the available color
     const newPlayerColor = playersInGame.length && playersInGame[0]?.color === 'B' ? 'W' : 'B'
     const newPlayerNumber = playersInGame.length && playersInGame[0].number === 1 ? 2 : 1
-    activePlayers.push({ player: socket.id, name: newPlayerName, gameId: gameId, color: newPlayerColor, opponent: opponent, number: newPlayerNumber })
+    activePlayers.push({ player: socket.id, newPlayerName, gameId: gameId, color: newPlayerColor, opponent: opponent, number: newPlayerNumber })
     playersInGame = activePlayers.filter(player => player.gameId === gameId)
     // console.log('playersInGame', playersInGame)
     socket.emit('game-joined', `Joined game as: ${newPlayerColor}`, newPlayerColor, newPlayerName, newPlayerNumber)
-    io.in(gameId).emit('set-players', playersInGame )
+    io.in(gameId).emit('set-players', JSON.stringify(playersInGame) )
   })
 
   socket.on('set-game-state', (gameState, placedPieces, currentPlayer, blackPos, gameOver, wins ) => {

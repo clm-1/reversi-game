@@ -103,8 +103,8 @@ const Game = () => {
     })
 
     socket.on('set-players', ( playersFromSocket ) => {
-      console.log('playersFromSocket', playersFromSocket)
-      setPlayersInGame(playersFromSocket)
+      console.log('playersFromSocket', JSON.parse(playersFromSocket))
+      setPlayersInGame(JSON.parse(playersFromSocket))
     })
 
     socket.on('get-game-state', game => {
