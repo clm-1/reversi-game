@@ -94,8 +94,8 @@ const Game = () => {
     console.log('socket', socket);
     socket.emit('join-game', { gameId, newPlayerName: localPlayer.name })
 
-    socket.on('game-joined', ({ msg, newPlayerColor, newPlayerName, newPlayerNumber }) => {
-      console.log(msg);
+    socket.on('game-joined', (message, msg2, newPlayerColor, newPlayerName, newPlayerNumber) => {
+      console.log(message, msg2);
       // setYou(newPlayerColor)
       setLocalPlayer({ name: newPlayerName, color: newPlayerColor, number: newPlayerNumber })
       setInGame(true)
