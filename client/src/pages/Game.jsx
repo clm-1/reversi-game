@@ -63,14 +63,14 @@ const Game = () => {
 
   // Set up socket connection
   useEffect(() => {
-    const s = io(import.meta.env.VITE_BACKEND_URL)
+    // const s = io(import.meta.env.VITE_BACKEND_URL)
 
-    // const s = io('http://localhost:3001', {
-    //   reconnection: true,
-    //   reconnectionAttempts: Infinity,
-    //   reconnectionDelay: 1000,
-    //   reconnectionDelayMax: 5000,
-    // })
+    const s = io('http://localhost:3001', {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    })
 
     setSocket(s)
   }, [])
@@ -92,7 +92,6 @@ const Game = () => {
   useEffect(() => {
     if (socket == null) return
     console.log('socket', socket);
-    const gameDetails = { gameId, newPlayerName: localPlayer.name }
     socket.emit('join-game', { gameId, newPlayerName: localPlayer.name })
 
     socket.on('game-joined', (message, newPlayerColor, newPlayerName, newPlayerNumber) => {
@@ -103,9 +102,8 @@ const Game = () => {
     })
 
     socket.on('set-players', ( data ) => {
-      console.log('DATA', data)
-      console.log('playersFromSocket', JSON.parse(data))
-      setPlayersInGame(JSON.parse(data))
+      console.log('playersFromSocket', data.playersInGame)
+      setPlayersInGame(data.playersInGame)
     })
 
     socket.on('get-game-state', game => {
@@ -183,7 +181,7 @@ const Game = () => {
 
   useEffect(() => {
     let opponent = 'not joined'
-    if (playersInGame.length === 2) {
+    if (playersInGame && playersInGame.length === 2) {
       opponent = playersInGame.filter(player => player.name !== localPlayer.name)[0]?.name
       if (!opponent) opponent = localPlayer.name
       setLocalPlayer({ ...localPlayer, opponent })
@@ -512,7 +510,7 @@ const Game = () => {
 
   return (
     <>
-      {playersInGame.length < 2 && !enterName && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
+      {playersInGame && playersInGame.length < 2 && !enterName && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
       {enterName && <EnterName handleQuitGameClick={handleQuitGameClick} handleSetNameClick={handleSetNameClick} />}
       <div className={styles.gameId}>
         <p>Game ID:</p>
