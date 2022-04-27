@@ -63,14 +63,14 @@ const Game = () => {
 
   // Set up socket connection
   useEffect(() => {
-    // const s = io(import.meta.env.VITE_BACKEND_URL)
+    const s = io(import.meta.env.VITE_BACKEND_URL)
 
-    const s = io('http://localhost:3001', {
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-    })
+    // const s = io('http://localhost:3001', {
+    //   reconnection: true,
+    //   reconnectionAttempts: Infinity,
+    //   reconnectionDelay: 1000,
+    //   reconnectionDelayMax: 5000,
+    // })
 
     setSocket(s)
   }, [])
@@ -201,7 +201,7 @@ const Game = () => {
   }
 
   const handleSetNameClick = (newName) => {
-    socket.emit('join-game', gameId, newName)
+    socket.emit('join-game', { gameId, newPlayerName: newName })
     setEnterName(false)
   }
 
