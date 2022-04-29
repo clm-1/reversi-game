@@ -8,14 +8,14 @@
   top: -.9rem;
 }
 
-.homeWrapper h1 {
+/* .homeWrapper h1 {
   position: relative;
   left: -12px;
   margin-bottom: .5vh;
   font-size: clamp(2.4rem, calc(5rem + 7vh - 1vw), 11rem);
   font-family: 'Kolker Brush', cursive;
   filter: drop-shadow(0 0 17px rgba(110, 243, 253, 0.2))
-}
+} */
 
 .enterGameWrapper {
   width: calc(300px + 2vh);

@@ -29,6 +29,10 @@
   /* overflow: hidden; */
 }
 
+.roomFullModal {
+  width: 300px;
+}
+
 .waitingForPlayerModal .buttonsWrapper {
   display: flex;
   gap: 1rem;

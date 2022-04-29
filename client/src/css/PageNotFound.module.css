@@ -1,0 +1,34 @@
+.pageNotFoundWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 .7rem;
+  top: -.9rem;
+}
+
+.pageNotFoundWrapper button {
+  opacity: 1;
+  background: rgb(123, 245, 253);
+  color: black;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-top: .9rem;
+  padding: clamp(.7rem, calc(.6rem + 1vh), 1rem);
+  border-radius: 10px;
+}
+
+.pageNotFoundWrapper a {
+  opacity: 1;
+  background: rgb(123, 245, 253);
+  color: black;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-top: 2.5rem;
+  padding: clamp(.7rem, calc(.6rem + 1vh), 1rem);
+  border-radius: 10px;
+  text-decoration: none;
+  width: 150px;
+  text-align: center;
+}

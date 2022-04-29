@@ -16,7 +16,17 @@ body {
   background: radial-gradient(circle, rgb(27, 38, 44) 0%, rgba(19,24,24,1) 100%);
 }
 
-button {
+h1 {
+  position: relative;
+  left: -12px;
+  margin-bottom: .5vh;
+  font-size: clamp(2.4rem, calc(5rem + 7vh - 1vw), 11rem);
+  font-family: 'Kolker Brush', cursive;
+  filter: drop-shadow(0 0 17px rgba(110, 243, 253, 0.2))
+}
+
+button,
+a {
   cursor: pointer;
   border: 1px solid rgb(123, 245, 253, .7);
   color: rgb(123, 245, 253, .7);
@@ -29,7 +39,8 @@ button.outlined:hover {
   transition: .3s;
 }
 
-button:active {
+button:active,
+a:active {
   transition: none;
   transform: scale(1.02);
 }

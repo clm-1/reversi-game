@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { io } from 'socket.io-client'
 import EnterName from '../components/EnterName'
+import RoomFull from '../components/RoomFull'
 import WaitingForPlayer from '../components/WaitingForPlayer'
 import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Game.module.css'
@@ -497,6 +498,7 @@ const Game = () => {
     <>
       {playersInGame && playersInGame.length < 2 && !enterName && !roomFull && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
       {enterName && <EnterName handleQuitGameClick={handleQuitGameClick} handleSetNameClick={handleSetNameClick} />}
+      {roomFull && <RoomFull handleQuitGameClick={handleQuitGameClick} />}
       <div className={styles.gameId}>
         <p>Game ID:</p>
         <span ref={gameIdRef}>{gameId}</span>

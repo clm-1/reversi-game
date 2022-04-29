@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import Game from './pages/Game'
 import Home from './pages/Home'
+import PageNotFound from './pages/PageNotFound'
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/game/:gameId" element={<Game />} />
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>
     </div>
