@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
 import styles from '../css/WaitingForPlayer.module.css'
-import BeatLoader from 'react-spinners/BeatLoader'
 
 const EnterName = ({ handleSetNameClick, handleQuitGameClick }) => {
   const usernameRef = useRef()
 
-  const handleSetName = () => {
+  const handleSetName = (e) => {
+    e.preventDefault()
     if (!usernameRef.current.value) return
     handleSetNameClick(usernameRef.current.value)
   }
@@ -15,10 +15,10 @@ const EnterName = ({ handleSetNameClick, handleQuitGameClick }) => {
       <div className={styles.waitingForPlayerModal}>
         <p>ENTER NAME</p>
         <div className={`${styles.buttonsWrapper} ${styles.enterNameWrapper}`}>
-          <form>
+          <form onSubmit={handleSetName}>
             <input type="text" ref={usernameRef} autoFocus required />
             <div className={styles.enterNameButtonsWrapper}>
-              <button className="outlined" type="submit" onClick={handleSetName}>SET NAME</button>
+              <button className="outlined" type="submit">SET NAME</button>
               <button className="outlined" onClick={handleQuitGameClick}>QUIT GAME</button>
             </div>
           </form>

@@ -8,43 +8,63 @@ import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Game.module.css'
 
 const Game = () => {
-  // const { socket, setSocket, setGame, closeSocket } = useSocketContext()
-  const { setInGame, playerNames, localPlayer, setLocalPlayer } = useGameContext()
-  // const [you, setYou] = useState(null)
-  const [currentPlayer, setCurrentPlayer] = useState('B')
-  const [blackPos, setBlackPos] = useState(1)
-  const [playersInGame, setPlayersInGame] = useState([])
-  const [enterName, setEnterName] = useState(false)
-  const [noMoves, setNoMoves] = useState(0)
-  const [wins, setWins] = useState([0, 0])
-  const [gameOver, setGameOver] = useState(false)
-  const { gameId } = useParams()
-  const [socket, setSocket] = useState()
-  const [score, setScore] = useState({ white: 2, black: 2 })
-  const initialGameBoardState = [
-    'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X',
-    '0', '0', '0', '0', '0', '0', '0', '0', 'X',
-    '0', '0', '0', '0', '0', '0', '0', '0', 'X',
-    '0', '0', '0', '0', '0', '0', '0', '0', 'X',
-    '0', '0', '0', 'W', 'B', '0', '0', '0', 'X',
-    '0', '0', '0', 'B', 'W', '0', '0', '0', 'X',
-    '0', '0', '0', '0', '0', '0', '0', '0', 'X',
-    '0', '0', '0', '0', '0', '0', '0', '0', 'X',
-    '0', '0', '0', '0', '0', '0', '0', '0', 'X',
-    'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X',
-  ]
-  const [gameBoardState, setGameBoardState] = useState(initialGameBoardState)
-  const [placedPieces, setPlacedPieces] = useState([39, 40, 48, 49])
-  const [currentValidMoves, setCurrentValidMoves] = useState({})
-  const [gameBoardMsg, setGameBoardMsg] = useState(null)
-  const [newMsg, setNewMsg] = useState(false)
+  const {
+    socket,
+    setSocket,
+    enterName,
+    setEnterName,
+    roomFull,
+    setRoomFull,
+    initialGameBoardState,
+    setInGame,
+    gameBoardState,
+    setGameBoardState,
+    placedPieces,
+    setPlacedPieces,
+    currentValidMoves,
+    setCurrentValidMoves,
+    wins,
+    setWins,
+    gameOver,
+    setGameOver,
+    localPlayer, 
+    setLocalPlayer,
+    currentPlayer,
+    setCurrentPlayer,
+    playersInGame,
+    setPlayersInGame,
+    score,
+    setScore,
+    squareClicked,
+    setSquareClicked,
+    noMoves,
+    setNoMoves,
+    blackPos,
+    setBlackPos,
+    gameMsg,
+    newMsg,
+    setNewMsg,
+    setGameMsg,
+    gameBoardMsg,
+    setGameBoardMsg,
+    setCurrentPlayerStyle,
+    countScore,
+    renderScore,
+    endGame,
+    printGameOverMsg,
+    handleResetGameClick,
+  } = useGameContext()
+  
   const navigate = useNavigate()
-  const [gameMsg, setGameMsg] = useState('Black\'s turn')
-  const [squareClicked, setSquareClicked] = useState(null)
-  const [roomFull, setRoomFull] = useState(false)
-  const moveToMake = useRef()
+
+  // Get game id from params in url
+  const { gameId } = useParams()
   const gameIdRef = useRef()
 
+  // Current move to make
+  const moveToMake = useRef()
+
+  // Reset game
   const resetGame = () => {
     setGameBoardMsg('starting new game...')
     setScore({ white: 2, black: 2 })
@@ -62,10 +82,12 @@ const Game = () => {
     }, 4500)
   }
 
-  // Set up socket connection
+  // Set up socket connection at start
   useEffect(() => {
+    // Use this connection for live connection
     const s = io(import.meta.env.VITE_BACKEND_URL)
 
+    // Use this for local host connection
     // const s = io('http://localhost:3001', {
     //   reconnection: true,
     //   reconnectionAttempts: Infinity,
@@ -76,34 +98,27 @@ const Game = () => {
     setSocket(s)
   }, [])
 
-  useEffect(() => {
-    let outcome = `${playerNames[score.white > score.black ? 'W' : 'B']} wins!`
-  }, [score])
-
-
-  useEffect(() => {
-    console.log('localPlayer', localPlayer)
-    if (localPlayer.color) {
-      setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\'s turn')
-    }
-  }, [localPlayer])
-
+  // When socket is set, this will run and establish game
   useEffect(() => {
     if (socket == null) return
-    console.log('socket', socket);
+    // First, join game (if no name is entered here the socket will send a message back and prompting user for name)
     socket.emit('join-game', { gameId, newPlayerName: localPlayer.name })
 
+    // If game is joined, set the local player
     socket.on('game-joined', ({ msg, newPlayerColor, newPlayerName, newPlayerNumber }) => {
       console.log(msg);
       setLocalPlayer({ name: newPlayerName, color: newPlayerColor, number: newPlayerNumber })
       setInGame(true)
     })
 
+    // Set players that were found for this gameId on server
     socket.on('set-players', ({ players }) => {
       console.log('playersFromSocket', players)
       if (players && players.length) setPlayersInGame(players)
     })
 
+    // Get the current game state
+    // This is used if a player joined an active game (if someone else started the game, or if the player quit and rejoins)
     socket.on('get-game-state', game => {
       console.log('getting game state:', game);
       setGameBoardState(game.gameState)
@@ -111,26 +126,28 @@ const Game = () => {
       setPlacedPieces(game.placedPieces)
       countScore(game.gameState)
       setGameOver(game.gameOver)
+      // Check valid moves for the current player when joining game
       if (!game.gameOver) checkValidMoves(game.gameState, game.placedPieces, game.currentPlayer)
     })
 
+    // Get these states first, position of black on scoreboard and total wins
     socket.on('get-initial-states', (newBlackPos, newWins) => {
       console.log('initial states', newBlackPos, newWins)
       setBlackPos(newBlackPos)
       setWins(newWins)
     })
 
-    // Prompt user to enter name if none is found on server
+    // Prompt user to enter name if none is found on server (will open EnterName-modal)
     socket.on('enter-name', message => {
       setEnterName(true)
     })
 
-    // Display message if opponent is disconnected
+    // Console log if opponent is disconnected
     socket.on('player-disconnected', player => {
       console.log(`${player} disconnected`);
     })
 
-    // If room already has 2 players
+    // If room already has 2 players (will open RoomFull-modal)
     socket.on('room-full', message => {
       console.log(message);
       setRoomFull(true)
@@ -143,11 +160,13 @@ const Game = () => {
       setGameBoardState(gameState)
     })
 
+    // Reset game to initial state (but changing player colors and position of black on scoreboard)
     socket.on('reset-game', (blackPos) => {
       resetGame()
       setBlackPos(blackPos)
     })
 
+    // Recieve this from socket if you are the one that reset the game
     socket.on('sender-reset', playerData => {
       setLocalPlayer({
         name: playerData.name,
@@ -156,9 +175,9 @@ const Game = () => {
         number: playerData.number,
       })
       setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\s turn')
-      console.log('You reset the game', playerData)
     })
 
+    // Recieve this from socket if opponent reset the game
     socket.on('opponent-reset', playerData => {
       setLocalPlayer({
         name: playerData.name,
@@ -167,73 +186,44 @@ const Game = () => {
         number: playerData.number,
       })
       setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\s turn')
-      console.log('Opponent reset the game', playerData)
     })
 
   }, [socket])
 
+  // Check local player color and set game message
+  useEffect(() => {
+    console.log('localPlayer', localPlayer)
+    if (localPlayer.color) {
+      setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\'s turn')
+    }
+  }, [localPlayer])
+
+  // Check players length and set the name of the opponent player
   useEffect(() => {
     let opponent = 'not joined'
     if (playersInGame && playersInGame.length === 2) {
       opponent = playersInGame.filter(player => player.name !== localPlayer.name)[0]?.name
+      // If nothing is found above, players have the same name
       if (!opponent) opponent = localPlayer.name
       setLocalPlayer({ ...localPlayer, opponent })
     }
   }, [playersInGame])
 
-  useEffect(() => {
-    if (!localPlayer.color) return
-    console.log('You are:', localPlayer.color);
-  }, [localPlayer.color])
-
-  useEffect(() => {
-    console.log('blackPos', blackPos)
-  }, [blackPos])
-
+  // Leave game and disconnect from socket
   const handleQuitGameClick = () => {
     socket.disconnect()
-    // socket.emit('leave-game')
     navigate('/')
   }
 
+  // If name is entered in "EnterName" modal, send new join-game with name to socket
   const handleSetNameClick = (newName) => {
     socket.emit('join-game', { gameId, newPlayerName: newName })
     setEnterName(false)
   }
 
-  // Count score after each move
-  const countScore = (arrayToCount) => {
-    let newScore = { white: 0, black: 0 }
-    arrayToCount.forEach((square => {
-      if (square === 'W') newScore.white++
-      if (square === 'B') newScore.black++
-    }))
-    const leader = playerNames[newScore.white > newScore.black ? 'W' : 'B']
-    console.log(`leader`, leader)
-    setScore(newScore)
-    return newScore
-  }
-
-  const endGame = (score) => {
-    let outcome = printGameOverMsg(score)
-    setGameMsg(outcome)
-    setGameBoardMsg(outcome)
-    setNoMoves(0)
-    setCurrentValidMoves({})
-    let tempWins = wins
-    tempWins[getWinner(score) - 1]++
-    setWins(tempWins)
-    socket.emit('set-game-over', gameId, getWinner(score) !== 0 ? tempWins : wins)
-    setGameOver(true)
-    setTimeout(() => {
-      setGameBoardMsg(null)
-    }, 4500)
-  }
-
   // Check valid moves for the current player (runs when current player changes)
+  // squaresToCheck = All indexes currently in placesPieces-state
   const checkValidMoves = (gameBoardArray, squaresToCheck, player) => {
-    // console.log('checking', player)
-
     // Establish opponent
     const opponent = player === 'W' ? 'B' : 'W'
 
@@ -245,22 +235,24 @@ const Game = () => {
     let squaresForCurrentMoveCheck = []
 
     // Function for checking each square in a chosen direction
+    // This function is used below and runs itself multiple times if needed
     const checkFromCurrentSquare = (startSquare, numPerStep, step) => {
       const checkSquare = startSquare + (numPerStep * step)
 
+      // Return if the current index contains your color, X or 0 on first step
       if (
         gameBoardArray[checkSquare] === player ||
         gameBoardArray[checkSquare] === 'X' ||
         (gameBoardArray[checkSquare] === '0' && step === 1)
       ) return
 
+      // If square contains opponent piece, keep going to next step
       if (gameBoardArray[checkSquare] === opponent) {
         squaresForCurrentMoveCheck.unshift(checkSquare)
         return checkFromCurrentSquare(startSquare, numPerStep, step + 1)
       }
 
       if (gameBoardArray[checkSquare] === '0') {
-        // console.log('valid move', (checkSquare))
         if (!validMoves[checkSquare]) {
           validMoves[checkSquare] = squaresForCurrentMoveCheck
         } else {
@@ -274,10 +266,10 @@ const Game = () => {
     const steps = [1, -1, 9, -9, 8, -8, 10, -10]
 
     // Iterate through the directions listed above for each square containing a piece in the current player's color
-    // console.log('squaresToCheck: ', squaresToCheck)
     squaresToCheck.forEach((square) => {
       if (gameBoardArray[square] === player) {
         steps.forEach(numPerStep => {
+          // Reset squares for current move check for each step
           squaresForCurrentMoveCheck = []
           checkFromCurrentSquare(square, numPerStep, 1)
         })
@@ -313,16 +305,14 @@ const Game = () => {
   // Check for no moves, end game if there are no moves for both players
   useEffect(() => {
     if (noMoves >= 2) {
-      console.log('end game here')
       setNoMoves(0)
-      endGame(score)
+      endGame(gameId, score)
     }
   }, [noMoves])
 
-  // Check valid moves for the new player
+  // Check valid moves for the new player when switching players
   useEffect(() => {
     setSquareClicked(null)
-    console.log('NO MOVES IN USEeffect', noMoves)
     if (!gameOver) {
       if (localPlayer.color) {
         setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\s turn')
@@ -331,35 +321,10 @@ const Game = () => {
     }
   }, [currentPlayer])
 
-  const printGameOverMsg = (score) => {
-    let msg = 'You win!'
-    if (localPlayer.color && localPlayer.color === 'B') {
-      if (score.black > score.white) msg = 'You win!'
-      else msg = 'Opponent wins!'
-    }
-    if (localPlayer.color && localPlayer.color === 'W') {
-      if (score.white > score.black) msg = 'You win!'
-      else msg = 'Opponent wins!'
-    }
-    if (score.white === score.black) msg = 'Draw!'
-    return msg.toUpperCase()
-  }
-
-  const getWinner = (score) => {
-    let winner;
-    if (score.white === score.black) winner = 'draw'
-    if (!winner) winner = score.black > score.white ? 'B' : 'W'
-    let winnerNumber;
-    if (localPlayer.color && localPlayer.color === winner) {
-      winnerNumber = localPlayer.number
-    } else {
-      winnerNumber = localPlayer.number === 1 ? 2 : 1
-    }
-    if (winner === 'draw') winnerNumber = 0
-    return winnerNumber
-  }
-
+  // This will run on gameBoardState change
+  // The first piece is placed below on click for local player (and triggers this)
   useEffect(() => {
+    // Check if there is a move to make
     if (moveToMake.current && moveToMake.current.piecesToChange.length) {
       let tempGameStateArray = [...gameBoardState]
 
@@ -376,63 +341,62 @@ const Game = () => {
       //   setGameBoardState(tempGameStateArray)
       // }, 0)
 
+      // This length-check was used before when animating in each piece one by one
+      // Not really needed now but kept in if needed later
       if (!moveToMake.current.piecesToChange.length) {
+        // All moves done, set movesToMake to null
         moveToMake.current = null;
+        // Set new score in temp variable to make sure it's updated when sending score to socket (setScore has slight delay)
         let newScore = countScore(tempGameStateArray)
+        // Check if there are any empty squares left (to see if game is over)
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
+        // Send game state to socket
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        if (emptySquares !== 0) {
+        if (emptySquares > 55) {
+          // Change player after slight delay
           setTimeout(() => {
             setNewMsg(true);
             setTimeout(() => { setNewMsg(false) }, 1500)
             setCurrentPlayer(currentPlayer === 'W' ? 'B' : 'W')
           }, 1400);
         } else {
-          endGame(newScore)
+          endGame(gameId, newScore)
         }
       }
     }
   }, [gameBoardState])
 
   const handleGameSquareClick = async (i) => {
+    // If game over or not local players turn, do nothing on click
     if (gameOver || (localPlayer.color !== currentPlayer)) return
 
     // Return if clicked square is not in currentValidMoves
     if (!currentValidMoves[i]) return;
+    // Return if a square was already clicked before
     if (squareClicked) return
+
     setSquareClicked(true)
+
+    // Set current move to make
+    // moveIndex = square clicked by player
     moveToMake.current = {
       moveIndex: i,
       piecesToChange: [...currentValidMoves[i]]
     }
-    let test = moveToMake.current.piecesToChange.join(' ')
 
+    // Copy gameBoardState to start making changes
     let tempGameStateArray = [...gameBoardState]
+    // Set the first piece in the copied game state (clicked square)
     tempGameStateArray[i] = currentPlayer
-    console.log('place first piece')
 
-    // currentValidMoves[i].forEach(index => tempGameStateArray[index] = currentPlayer)
-    // countScore(tempGameStateArray)
+    // Add the first piece to array of placed pieces (used when checking valid moves)
     const newPlacedPieces = [...placedPieces, i]
+    // Send to socket that a move has been made
     socket.emit('move-made', moveToMake.current, tempGameStateArray, newPlacedPieces)
+    // Set the game state with the tempGameState (only one piece changed at this point, the rest will change in useEffect above)
     setGameBoardState(tempGameStateArray)
+    // Add first piece to placed pieces-state
     setPlacedPieces([...placedPieces, i])
-
-
-    // THE OLD WAY, NEW WAY IS IN USEEFFECT ABOVE
-
-    // Check if there are empty squares left / else end game
-    // const emptySquares = tempGameStateArray.filter(square => square === '0').length
-    // console.log('empty', emptySquares)
-    // if (emptySquares !== 0) {
-    //   setTimeout(() => {
-    //     setNewMsg(true);
-    //     setTimeout(() => { setNewMsg(false) }, 1500)
-    //     setCurrentPlayer(currentPlayer === 'W' ? 'B' : 'W')
-    //   }, 1400);
-    // } else {
-    //   endGame()
-    // }
   }
 
   // Save game id to clipboard on click
@@ -440,11 +404,8 @@ const Game = () => {
     navigator.clipboard.writeText(idToCopy)
   }
 
-  // Send reset game event to server, will emit back to both players
-  const handleResetGameClick = () => {
-    socket.emit('reset-game', gameId)
-  }
-
+  // Render the game board with square and pieces in correct colors
+  // Set CSS based on what color is set there / or no piece placed
   const renderGameBoard = () => {
     if (gameBoardState && gameBoardState.length) return (
       gameBoardState.map((square, i) => {
@@ -454,7 +415,6 @@ const Game = () => {
             key={i}
             className={`${styles.gameSquare} ${currentValidMoves[i] ? styles.validMove : ''}`}
             onClick={() => handleGameSquareClick(i)}>
-            {/* <span>{i}</span> */}
             {square === '0' && ''}
             {square === 'W' && <div className={`${styles.gamePiece} ${styles.whitePiece}`}></div>}
             {square === 'B' && <div className={`${styles.gamePiece} ${styles.blackPiece}`}></div>}
@@ -464,47 +424,27 @@ const Game = () => {
     )
   }
 
-  const renderScore = color => {
-    if (color === 'B') return (
-      <div className={styles.scoreWrapper}>
-        <div className={styles.scoreBlack}></div>
-        <span className={styles.scoreX}>x</span>
-        <span className={styles.scoreNumber}>{score.black}</span>
-      </div>
-    )
-    if (color === 'W') return (
-      <div className={styles.scoreWrapper}>
-        <div className={styles.scoreWhite}></div>
-        <span className={styles.scoreX}>x</span>
-        <span className={styles.scoreNumber}>{score.white}</span>
-      </div>
-    )
-  }
-
-  const setCurrentPlayerStyle = (num) => {
-    let activePos = null
-    if (gameOver) return ''
-    if (blackPos === 1) {
-      activePos = currentPlayer === 'B' ? 1 : 2
-    }
-    if (blackPos === 2) {
-      activePos = currentPlayer === 'B' ? 2 : 1
-    }
-    if (activePos === num) return styles.currentPlayer
-    else return ''
-  }
-
   return (
     <>
+      {/* Waiting for player-modal */}
       {playersInGame && playersInGame.length < 2 && !enterName && !roomFull && <WaitingForPlayer gameId={gameIdRef.current?.innerText} handleGameIdClick={handleGameIdClick} handleQuitGameClick={handleQuitGameClick} />}
+
+      {/* Enter name-modal */}
       {enterName && <EnterName handleQuitGameClick={handleQuitGameClick} handleSetNameClick={handleSetNameClick} />}
+
+      {/* Room full-modal */}
       {roomFull && <RoomFull handleQuitGameClick={handleQuitGameClick} />}
+
+      {/* Game ID at top of page */}
       <div className={styles.gameId}>
         <p>Game ID:</p>
         <span ref={gameIdRef}>{gameId}</span>
         <button onClick={() => handleGameIdClick(gameIdRef.current?.innerText)}><i className="fas fa-paste"></i></button>
       </div>
+
+      {/* Game wrapper (UI + gameboard) */}
       <div className={`${styles.gameWrapper} ${roomFull ? styles.roomFull : ''}`}>
+        {/* Scoreboard */}
         <div className={`${styles.scoreBoard}`}>
           <div className={`${styles.playerScore} ${setCurrentPlayerStyle(1)}`}>
             <div className={styles.winsWrapper}>
@@ -516,6 +456,7 @@ const Game = () => {
             {localPlayer.number === 2 &&
               <span>{localPlayer.opponent ? localPlayer.opponent.toUpperCase() : "N / A"}</span>
             }
+            {/* Render score based on color positions on scoreboard */}
             {localPlayer.color && localPlayer.number === 1 &&
               renderScore(localPlayer.color)}
             {localPlayer.color && localPlayer.number === 2 &&
@@ -532,6 +473,7 @@ const Game = () => {
             {localPlayer.number === 1 &&
               <span>{localPlayer.opponent ? localPlayer.opponent.toUpperCase() : "N / A"}</span>
             }
+            {/* Render score based on color positions on scoreboard */}
             {localPlayer.color && localPlayer.number === 2 &&
               renderScore(localPlayer.color)}
             {localPlayer.color && localPlayer.number === 1 &&
@@ -539,43 +481,34 @@ const Game = () => {
           </div>
         </div>
 
+        {/* Gameboard */}
         {gameBoardState?.length &&
           <div className={`${styles.gameBoardWrapper} ${gameOver ? styles.gameBoardDisabled : ''}`}>
             {renderGameBoard()}
           </div>}
-
+        
+        {/* Message below gameboard */}
         <div className={styles.gameUI}>
-          {/* <div className={`${styles.scoreBoard} ${styles.landscape}`}>
-            <div className={`${styles.playerScore} ${currentPlayer === 'W' ? styles.currentPlayer : ''}`}>
-              <div className={styles.scoreWhite}></div>
-              <span>{score.white}</span>
-            </div>
-            <div className={`${styles.playerScore} ${currentPlayer === 'B' ? styles.currentPlayer : ''}`}>
-              <div className={styles.scoreBlack}></div>
-              <span>{score.black}</span>
-            </div>
-          </div> */}
-
           <div className={`${styles.gameMessageWrapper}`}>
             {!gameOver &&
-              <p className={newMsg ? styles.newMsg : ''}>{gameMsg.toUpperCase()}</p>
+              <p className={`${newMsg ? styles.newMsg : ''} ${gameMsg === 'New game' ? styles.hideGameMsg : ''}`}>{gameMsg.toUpperCase()}</p>
             }
             {gameOver && score && <p className={newMsg ? styles.newMsg : ''}>
               {printGameOverMsg(score)}
             </p>}
           </div>
 
-          {/* <hr className={styles.gameHr} /> */}
-
+          {/* Buttons below game-message */}
           <div className={styles.gameBtnWrapper}>
             {gameOver &&
-              <button className="outlined" onClick={handleResetGameClick}>PLAY AGAIN</button>
+              <button className="outlined" onClick={() => handleResetGameClick(gameId)}>PLAY AGAIN</button>
             }
             <button className="outlined" onClick={handleQuitGameClick}>QUIT GAME</button>
           </div>
 
         </div>
 
+        {/* Message on top of game board (no moves, game over, game reset) */}
         {gameBoardMsg &&
           <div className={styles.gameBoardMessage}>
             <p>{gameBoardMsg.toUpperCase()}</p>

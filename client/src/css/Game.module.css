@@ -273,6 +273,10 @@
   filter: drop-shadow(0 0 4px rgb(123, 245, 253, .4));
 }
 
+.gameMessageWrapper p.hideGameMsg {
+  opacity: 0;
+}
+
 .gameHr {
   width: 100%;
   margin: .7rem 0;

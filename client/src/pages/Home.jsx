@@ -23,7 +23,7 @@ const Home = () => {
   const handleEnterGameClick = (e) => {
     e.preventDefault()
     if (!gameIdRef.current.value) return console.log('enter username and game id');
-    updateLocalPlayer(usernameRef.current.value)
+    setLocalPlayer({ ...localPlayer, name: usernameRef.current.value })
     navigate(`/game/${gameIdRef.current.value}`)
   }
 
