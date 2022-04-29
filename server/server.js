@@ -1,3 +1,4 @@
+// Set up the socket
 const io = require('socket.io')(process.env.PORT || 3001, {
   cors: {
     origin: 'http://localhost:3000',
@@ -11,13 +12,13 @@ const io = require('socket.io')(process.env.PORT || 3001, {
   transports: ['websocket', 'polling']
 })
 
+// The active games and players
 let activePlayers = []
-
 const activeGames = {}
 
+// On connection from client
 io.on('connection', socket => {
-  console.log('connection made');
-  socket.emit('connection-made', { msg: 'hello' })
+  console.log('connection made', socket);
   socket.on('join-game', ({ gameId, newPlayerName }) => {
     try {
       // Establish initial data and check if room is full
@@ -45,7 +46,6 @@ io.on('connection', socket => {
       if (!newPlayerName) return socket.emit('enter-name', 'please enter name')
       socket.join(gameId)
 
-
       // Check if game id exists
       // Create new game or send existing game state to client
       if (!activeGames[gameId]) activeGames[gameId] = { gameState: [], placedPieces: [], currentPlayer: 'B', blackPos: 1, gameOver: false, wins: [0, 0] }
@@ -60,13 +60,15 @@ io.on('connection', socket => {
       activePlayers.push({ player: socket.id, name: newPlayerName, gameId: gameId, color: newPlayerColor, opponent: opponent, number: newPlayerNumber })
       playersInGame = activePlayers.filter(player => player.gameId === gameId)
 
+      // Send player data to client
       socket.emit('game-joined', { msg: `Joined game as: ${newPlayerColor}`, newPlayerColor, newPlayerName, newPlayerNumber })
-      io.in(gameId).emit('set-players', { players: playersInGame, test: 'hej' })
+      io.in(gameId).emit('set-players', { players: playersInGame })
     } catch (err) {
       console.log(err)
     }
   })
 
+  // Set game state on server on changes by client
   socket.on('set-game-state', (gameState, placedPieces, currentPlayer, blackPos, gameOver, wins) => {
     try {
       const game = activePlayers.filter(player => player.player === socket.id)[0]?.gameId
@@ -77,6 +79,7 @@ io.on('connection', socket => {
     }
   })
 
+  // On end game, set game over on server
   socket.on('set-game-over', (gameId, wins) => {
     try {
       activeGames[gameId].gameOver = true
@@ -86,6 +89,8 @@ io.on('connection', socket => {
     }
   })
 
+  // When client resets the game, reset all data on server for this game
+  // Switch player colors and move position of black (for scoreboard on front end)
   socket.on('reset-game', (gameId) => {
     try {
       console.log('game', gameId);
@@ -108,6 +113,8 @@ io.on('connection', socket => {
     }
   })
 
+  // On player disconnect
+  // Remove player and send new player list info to remaining client
   socket.on('disconnect', (reason) => {
     try {
       console.log('reason', reason)
@@ -123,6 +130,7 @@ io.on('connection', socket => {
     }
   })
 
+  // When move is made, send data to the other client
   socket.on('move-made', (move, gameState, newPlacedPieces) => {
     try {
       const game = activePlayers.filter(player => player.player === socket.id)[0].gameId
