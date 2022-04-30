@@ -100,10 +100,10 @@ const Game = () => {
   // Set up socket connection at start
   useEffect(() => {
     // Use this connection for live connection
-    // const s = io(import.meta.env.VITE_BACKEND_URL)
+    const s = io(import.meta.env.VITE_BACKEND_URL)
 
     // Use this for local host connection
-    const s = io('http://localhost:3001')
+    // const s = io('http://localhost:3001')
 
     setSocket(s)
   }, [])
@@ -194,7 +194,7 @@ const Game = () => {
         color: playerData.color,
         number: playerData.number,
       })
-      setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\s turn')
+      setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     })
 
     // Recieve this from socket if opponent reset the game
@@ -205,7 +205,7 @@ const Game = () => {
         color: playerData.color,
         number: playerData.number,
       })
-      setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\s turn')
+      setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     })
 
   }, [socket])
@@ -333,7 +333,7 @@ const Game = () => {
     setSquareClicked(null)
     if (!gameOver) {
       if (localPlayer.color) {
-        setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\s turn')
+        setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\'s turn')
       }
       checkValidMoves(gameBoardState, placedPieces, currentPlayer)
     }
