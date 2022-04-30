@@ -69,7 +69,11 @@ const Game = () => {
   // Reset game
   const resetGame = () => {
     resetClicked.current = true
-    if (gameBoardMsgTimer.current) gameBoardMsgTimer.current = null
+    setGameBoardMsg(null)
+    if (gameBoardMsgTimer.current) {
+      clearTimeout(gameBoardMsgTimer.current)
+      gameBoardMsgTimer.current = null
+    }
     setGameBoardMsg('starting new game...')
     setScore({ white: 2, black: 2 })
     setTimeout(() => {

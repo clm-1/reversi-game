@@ -124,7 +124,7 @@ io.on('connection', socket => {
       activePlayers = activePlayers.filter(player => player.player !== socket.id)
       const playersInGame = activePlayers.filter(player => player.gameId === game)
       io.in(game).emit('set-players', { players: playersInGame })
-      if (!playersInGame.length) delete activeGames[game]
+      // if (!playersInGame.length) delete activeGames[game]
     } catch (err) {
       console.log(err)
     }
