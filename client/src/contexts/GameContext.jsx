@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef } from 'react';
 import styles from '../css/Game.module.css'
 
 const GameContext = createContext()
@@ -42,9 +42,11 @@ const GameContextProvider = ({ children }) => {
   const [score, setScore] = useState({ white: 2, black: 2 })
   const [squareClicked, setSquareClicked] = useState(null)
   const [noMoves, setNoMoves] = useState(0)
+  const resetClicked = useRef(false)
 
   const [newMsg, setNewMsg] = useState(false)
   const [gameMsg, setGameMsg] = useState('New game')
+  const gameBoardMsgTimer = useRef(null)
   const [gameBoardMsg, setGameBoardMsg] = useState(null)
 
   // Check which position (top/bottom) on scoreboard should have the active player-style
@@ -118,7 +120,7 @@ const GameContextProvider = ({ children }) => {
     setWins(tempWins)
     socket.emit('set-game-over', gameId, getWinner(score) !== 0 ? tempWins : wins)
     setGameOver(true)
-    setTimeout(() => {
+    gameBoardMsgTimer.current = setTimeout(() => {
       setGameBoardMsg(null)
     }, 4500)
   }
@@ -177,10 +179,12 @@ const GameContextProvider = ({ children }) => {
     setNoMoves,
     blackPos,
     setBlackPos,
+    resetClicked,
     newMsg,
     setNewMsg,
     gameMsg,
     setGameMsg,
+    gameBoardMsgTimer,
     gameBoardMsg,
     setGameBoardMsg,
     setCurrentPlayerStyle,

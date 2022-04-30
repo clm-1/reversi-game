@@ -4,7 +4,6 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  /* margin: 0 .7rem; */
   padding-top: 2rem;
 }
 
@@ -27,7 +26,6 @@
   color: rgba(123, 244, 253, 0.5);
   background-color: rgb(125 204 204 / 11%);
   z-index: 1;
-  /* border-bottom: 1px solid rgba(123, 244, 253, 0.466); */
 }
 
 .gameId span {
@@ -54,7 +52,6 @@
   align-items: center;
   height: 100%;
   width: 100%;
-  /* margin-left: 1rem; */
 }
 
 .scoreBoard {
@@ -86,7 +83,6 @@
   display: flex;
   margin-left: auto;
   min-width: 70px;
-  /* justify-content: space-between; */
   align-items: center;
 }
 
@@ -144,7 +140,6 @@
 .gameBoardWrapper {
   width: 100%;
   display: grid;
-  /* gap: clamp(.05rem, calc(.1rem + .5vw), .3rem); */
   gap: 2px;
   grid-template-columns: repeat(8, 1fr);
 }
@@ -157,20 +152,13 @@
 .gameSquare {
   border-radius: clamp(1px, calc(2px + .5vw), 3px);
   cursor: pointer;
-  /* background: rgba(99, 177, 207, 0.22); */
-  background: rgb(129 192 216 / 22%);
+  background: #354a50;
   position: relative;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2);
-  /* border-left: 1px solid rgba(255, 255, 255, 0.05); */
-  /* border-top: 1px solid rgba(255, 255, 255, 0.05); */
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .gameSquare:after {
@@ -188,7 +176,6 @@
   width: 86%;
   height: 86%;
   border-radius: 50%;
-  /* animation: gamePieceAnimation .4s ease-in-out forwards; */
   transform: scale(.95);
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
@@ -203,39 +190,30 @@
 
 @keyframes gamePieceAnimation {
   0% {
-    /* box-shadow: none; */
     transform: scale(.95);
   }
 
   50% {
-    /* box-shadow: 0 0 6px rgba(0, 0, 0, 0.2); */
     transform: scale(1);
   }
 
   100% {
-    /* box-shadow: none; */
     transform: scale(.95);
   }
 }
 
 .whitePiece {
   background: white;
-  /* background: radial-gradient(circle, rgb(116, 232, 255) 0%, rgba(37,146,168,1) 90%, rgb(29, 122, 136) 100%); */
   outline: 3px solid rgb(236, 236, 236);
-  /* outline: 3px solid rgb(94, 175, 210); */
   outline-offset: -1px;
   animation: gamePieceAnimation .7s ease-in-out;
-  /* box-shadow: 0 0 7px rgb(116, 232, 255); */
 }
 
 .blackPiece {
   background: rgb(19, 18, 18);
-  /* background: radial-gradient(circle, rgb(255, 116, 116) 0%, rgb(168, 37, 37) 90%, rgb(136, 43, 29) 100%); */
   outline: 3px solid rgb(0, 0, 0);
-  /* outline: 3px solid rgb(210, 110, 94); */
   outline-offset: -1px;
   animation: gamePieceAnimation .7s ease-in-out;
-  /* box-shadow: 0 0 7px rgb(255, 125, 116); */
 }
 
 .gameMessageWrapper {
@@ -274,6 +252,7 @@
 }
 
 .gameMessageWrapper p.hideGameMsg {
+  transition: none;
   opacity: 0;
 }
 
@@ -285,8 +264,6 @@
 }
 
 .gameBtnWrapper {
-  /* width: 70%; */
-  /* max-width: 220px; */
   display: flex;
   margin-top: calc(.7rem + .7vw);
   margin-bottom: 2rem;
@@ -299,8 +276,6 @@
   background: none;
   padding: .8rem;
   min-width: 110px;
-  /* padding: clamp(.5rem, calc(.5rem + 2vw), 1rem) clamp(1rem, calc(1rem + 4.5vw), 3rem); */
-  /* width: 100%; */
   border-radius: 15px;
 }
 
@@ -345,46 +320,6 @@
   position: absolute;
   top: 20px;
 }
-
-/* @media screen and (orientation: landscape) {
-  .gameWrapper {
-    flex-direction: row;
-  }
-
-  .gameUI {
-    width: 30%;
-  }
-
-  .gameMessageWrapper {
-    border: 1px solid rgb(123, 245, 253, .6);
-    background: none;
-  }
-
-  .playerScore {
-    width: 100%;
-    justify-content: flex-start;
-    padding-left: 1rem;
-  }
-
-  .gameBoardWrapper {
-    width: 70%;
-    max-width: 80vh;
-  }
-
-  .gameBtnWrapper {
-    max-width: 100%;
-  }
-
-  .portrait {
-    display: none;
-    pointer-events: none;
-  }
-
-  .landscape {
-    display: flex;
-    pointer-events: initial;
-  }
-} */
 
 @media screen and (min-width: 400px) {
   .gameBoardMessage {

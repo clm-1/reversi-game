@@ -42,9 +42,11 @@ const Game = () => {
     blackPos,
     setBlackPos,
     gameMsg,
+    resetClicked,
     newMsg,
     setNewMsg,
     setGameMsg,
+    gameBoardMsgTimer,
     gameBoardMsg,
     setGameBoardMsg,
     setCurrentPlayerStyle,
@@ -66,12 +68,15 @@ const Game = () => {
 
   // Reset game
   const resetGame = () => {
+    resetClicked.current = true
+    if (gameBoardMsgTimer.current) gameBoardMsgTimer.current = null
     setGameBoardMsg('starting new game...')
     setScore({ white: 2, black: 2 })
     setTimeout(() => {
       setGameBoardMsg('switching player colors')
     }, 1500)
     setTimeout(() => {
+      resetClicked.current = false
       setGameBoardState(initialGameBoardState)
       setCurrentPlayer('B')
       setPlacedPieces([39, 40, 48, 49])
@@ -493,14 +498,14 @@ const Game = () => {
             {!gameOver &&
               <p className={`${newMsg ? styles.newMsg : ''} ${gameMsg === 'New game' ? styles.hideGameMsg : ''}`}>{gameMsg.toUpperCase()}</p>
             }
-            {gameOver && score && <p className={newMsg ? styles.newMsg : ''}>
+            {gameOver && score && <p className={`${newMsg ? styles.newMsg : ''} ${resetClicked.current === true ? styles.hideGameMsg : ''}`}>
               {printGameOverMsg(score)}
             </p>}
           </div>
 
           {/* Buttons below game-message */}
           <div className={styles.gameBtnWrapper}>
-            {gameOver &&
+            {gameOver && !resetClicked.current &&
               <button className="outlined" onClick={() => handleResetGameClick(gameId)}>PLAY AGAIN</button>
             }
             <button className="outlined" onClick={handleQuitGameClick}>QUIT GAME</button>
