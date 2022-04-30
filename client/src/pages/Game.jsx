@@ -27,7 +27,7 @@ const Game = () => {
     setWins,
     gameOver,
     setGameOver,
-    localPlayer, 
+    localPlayer,
     setLocalPlayer,
     currentPlayer,
     setCurrentPlayer,
@@ -56,7 +56,7 @@ const Game = () => {
     printGameOverMsg,
     handleResetGameClick,
   } = useGameContext()
-  
+
   const navigate = useNavigate()
 
   // Get game id from params in url
@@ -91,18 +91,19 @@ const Game = () => {
     }, 4500)
   }
 
+  // Leave game and disconnect from socket
+  const handleQuitGameClick = () => {
+    socket.disconnect()
+    navigate('/')
+  }
+
   // Set up socket connection at start
   useEffect(() => {
     // Use this connection for live connection
-    const s = io(import.meta.env.VITE_BACKEND_URL)
+    // const s = io(import.meta.env.VITE_BACKEND_URL)
 
     // Use this for local host connection
-    // const s = io('http://localhost:3001', {
-    //   reconnection: true,
-    //   reconnectionAttempts: Infinity,
-    //   reconnectionDelay: 1000,
-    //   reconnectionDelayMax: 5000,
-    // })
+    const s = io('http://localhost:3001')
 
     setSocket(s)
   }, [])
@@ -114,26 +115,31 @@ const Game = () => {
     socket.emit('join-game', { gameId, newPlayerName: localPlayer.name })
 
     // If game is joined, set the local player
-    socket.on('game-joined', ({ msg, newPlayerColor, newPlayerName, newPlayerNumber }) => {
-      console.log(msg);
+    socket.on('game-joined', ({ msg, newPlayerColor, newPlayerName, newPlayerNumber, currentPlayer }) => {
+      // console.log(msg, 'CURRENT PLAYER IN GAME-JOINED:', currentPlayer);
       setLocalPlayer({ name: newPlayerName, color: newPlayerColor, number: newPlayerNumber })
+      setCurrentPlayer(currentPlayer)
       setInGame(true)
     })
 
     // Set players that were found for this gameId on server
     socket.on('set-players', ({ players }) => {
-      console.log('playersFromSocket', players)
+      // console.log('playersFromSocket', players)
       if (players && players.length) setPlayersInGame(players)
     })
 
     // Get the current game state
     // This is used if a player joined an active game (if someone else started the game, or if the player quit and rejoins)
     socket.on('get-game-state', game => {
-      console.log('getting game state:', game);
+      // console.log('getting game state:', game);
       setGameBoardState(game.gameState)
-      if (!game.gameOver) setCurrentPlayer(game.currentPlayer)
       setPlacedPieces(game.placedPieces)
       countScore(game.gameState)
+      if (!game.gameOver) {
+        setTimeout(() => {
+          setCurrentPlayer(game.currentPlayer)
+        }, 300)
+      }
       setGameOver(game.gameOver)
       // Check valid moves for the current player when joining game
       if (!game.gameOver) checkValidMoves(game.gameState, game.placedPieces, game.currentPlayer)
@@ -141,7 +147,7 @@ const Game = () => {
 
     // Get these states first, position of black on scoreboard and total wins
     socket.on('get-initial-states', (newBlackPos, newWins) => {
-      console.log('initial states', newBlackPos, newWins)
+      // console.log('initial states', newBlackPos, newWins)
       setBlackPos(newBlackPos)
       setWins(newWins)
     })
@@ -151,9 +157,14 @@ const Game = () => {
       setEnterName(true)
     })
 
+    // Send player back to main menu if disconnected (if computer goes into sleep mode for example)
+    socket.on('disconnect', () => {
+      handleQuitGameClick()
+    })
+
     // Console log if opponent is disconnected
     socket.on('player-disconnected', player => {
-      console.log(`${player} disconnected`);
+      // console.log(`${player} disconnected`);
     })
 
     // If room already has 2 players (will open RoomFull-modal)
@@ -201,7 +212,7 @@ const Game = () => {
 
   // Check local player color and set game message
   useEffect(() => {
-    console.log('localPlayer', localPlayer)
+    // console.log('localPlayer', localPlayer)
     if (localPlayer.color) {
       setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\'s turn')
     }
@@ -218,12 +229,6 @@ const Game = () => {
     }
   }, [playersInGame])
 
-  // Leave game and disconnect from socket
-  const handleQuitGameClick = () => {
-    socket.disconnect()
-    navigate('/')
-  }
-
   // If name is entered in "EnterName" modal, send new join-game with name to socket
   const handleSetNameClick = (newName) => {
     socket.emit('join-game', { gameId, newPlayerName: newName })
@@ -233,6 +238,8 @@ const Game = () => {
   // Check valid moves for the current player (runs when current player changes)
   // squaresToCheck = All indexes currently in placesPieces-state
   const checkValidMoves = (gameBoardArray, squaresToCheck, player) => {
+    if (!player) return;
+    // console.log('Running valid moves check for:', player)
     // Establish opponent
     const opponent = player === 'W' ? 'B' : 'W'
 
@@ -287,7 +294,7 @@ const Game = () => {
 
     // If there are no valid moves (show message and change current player)
     let movesList = Object.keys(validMoves)
-    // movesList = []
+    // console.log('MOVES LIST', movesList)
     if (!movesList.length) {
       if (!gameOver) {
         let noMovesMsg = ''
@@ -295,6 +302,7 @@ const Game = () => {
           noMovesMsg = 'You have no moves...'
         } else noMovesMsg = 'Opponent has no moves...'
         setGameBoardMsg(noMovesMsg)
+        socket.emit('set-game-state', gameBoardArray, squaresToCheck, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
       }
 
       setTimeout(() => {
@@ -321,6 +329,7 @@ const Game = () => {
 
   // Check valid moves for the new player when switching players
   useEffect(() => {
+    // console.log('CURRENT PLAYER', currentPlayer)
     setSquareClicked(null)
     if (!gameOver) {
       if (localPlayer.color) {
@@ -361,7 +370,7 @@ const Game = () => {
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
         // Send game state to socket
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        if (emptySquares > 55) {
+        if (emptySquares !== 0) {
           // Change player after slight delay
           setTimeout(() => {
             setNewMsg(true);
@@ -495,7 +504,7 @@ const Game = () => {
           <div className={`${styles.gameBoardWrapper} ${gameOver ? styles.gameBoardDisabled : ''}`}>
             {renderGameBoard()}
           </div>}
-        
+
         {/* Message below gameboard */}
         <div className={styles.gameUI}>
           <div className={`${styles.gameMessageWrapper}`}>

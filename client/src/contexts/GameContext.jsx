@@ -37,7 +37,7 @@ const GameContextProvider = ({ children }) => {
     number: 1,
   })
   const [blackPos, setBlackPos] = useState(1)
-  const [currentPlayer, setCurrentPlayer] = useState('B')
+  const [currentPlayer, setCurrentPlayer] = useState(null)
   const [playersInGame, setPlayersInGame] = useState([])
   const [score, setScore] = useState({ white: 2, black: 2 })
   const [squareClicked, setSquareClicked] = useState(null)
