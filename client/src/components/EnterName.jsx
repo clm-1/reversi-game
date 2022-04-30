@@ -19,7 +19,10 @@ const EnterName = ({ handleSetNameClick, handleQuitGameClick }) => {
             <input type="text" ref={usernameRef} autoFocus required />
             <div className={styles.enterNameButtonsWrapper}>
               <button className="outlined" type="submit">SET NAME</button>
-              <button className="outlined" onClick={handleQuitGameClick}>QUIT GAME</button>
+              <button className="outlined" onClick={(e) => {
+                e.preventDefault()
+                handleQuitGameClick()
+              }}>QUIT GAME</button>
             </div>
           </form>
         </div>
