@@ -69,7 +69,9 @@ const Game = () => {
   // Reset game
   const resetGame = () => {
     resetClicked.current = true
-    setLocalPlayer({ ...localPlayer, color: localPlayer.color = 'B' ? 'W' : 'B' })
+    const newColor = localPlayer.color = 'B' ? 'W' : 'B'
+    // setLocalPlayer({ ...localPlayer, color: localPlayer.color = 'B' ? 'W' : 'B' })
+    setGameMsg(newColor === 'B' ? 'Your turn' : 'Opponent\'s turn')
     setGameBoardMsg(null)
     if (gameBoardMsgTimer.current) {
       clearTimeout(gameBoardMsgTimer.current)
