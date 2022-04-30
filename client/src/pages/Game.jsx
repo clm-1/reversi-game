@@ -102,7 +102,7 @@ const Game = () => {
     // Use this connection for live connection
     // const s = io(import.meta.env.VITE_BACKEND_URL)
     // const s = io(import.meta.env.VITE_BACKEND_URL)
-    const s = io(process.env.VITE_BACKEND_URL)
+    const s = io(import.meta.env.BACKEND_URL)
 
     // Use this for local host connection
     // const s = io('http://localhost:3001')
