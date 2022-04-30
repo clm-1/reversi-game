@@ -69,6 +69,7 @@ const Game = () => {
   // Reset game
   const resetGame = () => {
     resetClicked.current = true
+    setLocalPlayer({ ...localPlayer, color: localPlayer.color = 'B' ? 'W' : 'B' })
     setGameBoardMsg(null)
     if (gameBoardMsgTimer.current) {
       clearTimeout(gameBoardMsgTimer.current)
