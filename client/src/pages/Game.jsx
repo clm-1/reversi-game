@@ -105,7 +105,7 @@ const Game = () => {
     // const s = io(import.meta.env.VITE_BACKEND_URL)
 
     // Use this for local host connection
-    const s = io('http://localhost:3001')
+    const s = io('http://clm-test-domain')
 
     setSocket(s)
   }, [])
