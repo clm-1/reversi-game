@@ -14,7 +14,7 @@ const Home = () => {
     if (inGame) {
       window.location.reload();
     }
-    console.log(`env test`, import.meta.env.TEST_ENV)
+    console.log(`env test`, process.env.TEST_ENV)
   }, [])
 
   const handleGenerateIdClick = () => (
