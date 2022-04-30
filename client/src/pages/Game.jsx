@@ -100,10 +100,10 @@ const Game = () => {
   // Set up socket connection at start
   useEffect(() => {
     // Use this connection for live connection
-    // const s = io(import.meta.env.VITE_BACKEND_URL)
+    const s = io(import.meta.env.VITE_BACKEND_URL)
 
     // Use this for local host connection
-    const s = io('http://localhost:3001')
+    // const s = io('http://localhost:3001')
 
     setSocket(s)
   }, [])
