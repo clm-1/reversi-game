@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { io } from 'socket.io-client'
 import EnterName from '../components/EnterName'
@@ -100,8 +100,6 @@ const Game = () => {
   // Set up socket connection at start
   useEffect(() => {
     // Use this connection for live connection
-    // const s = io(import.meta.env.VITE_BACKEND_URL)
-    // const s = io(import.meta.env.VITE_BACKEND_URL)
     const s = io(import.meta.env.VITE_BACKEND_URL)
 
     // Use this for local host connection

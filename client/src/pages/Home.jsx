@@ -14,7 +14,6 @@ const Home = () => {
     if (inGame) {
       window.location.reload();
     }
-    console.log(`env test`, import.meta.env.VITE_TEST_ENV)
   }, [])
 
   const handleGenerateIdClick = () => (
