@@ -65,11 +65,15 @@
   color: rgb(123, 245, 253);
   font-size: .95rem;
   border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
   margin-bottom: .6rem;
 }
 
 .enterGameWrapper input:focus {
-  outline: 1px solid rgba(179, 244, 248, 0.795);
+  outline: none;
+  border: 1px solid rgba(179, 244, 248, 0.795);
+  background: rgba(123, 244, 253, 0.056);
 }
 
 /* .enterGameWrapper input.gameIdInput {

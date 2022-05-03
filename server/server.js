@@ -1,8 +1,8 @@
 // Set up the socket
 const io = require('socket.io')(process.env.PORT || 3001, {
   cors: {
-    // origin: 'http://localhost:3000',
-    origin: process.env.FRONT_END_URL,
+    origin: 'http://localhost:3000',
+    // origin: process.env.FRONT_END_URL,
     methods: ['GET', 'POST']
   },
   pingInterval: 25000,
