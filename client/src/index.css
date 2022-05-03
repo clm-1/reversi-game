@@ -53,8 +53,14 @@ button.outlined:active {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 90%;
+  width: 80%;
   min-height: 100vh;
-  max-width: 600px;
+  max-width: 550px;
   margin: 0 auto;
+}
+
+@media screen and (min-width: 1300px) {
+  .mainContainer {
+    max-width: 600px;
+  }
 }
