@@ -4,8 +4,11 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  margin: 0 .7rem;
   padding-top: 2rem;
+}
+
+.disabledGameWrapper {
+  pointer-events: none;
 }
 
 .gameId {
@@ -23,7 +26,6 @@
   color: rgba(123, 244, 253, 0.5);
   background-color: rgb(125 204 204 / 11%);
   z-index: 1;
-  /* border-bottom: 1px solid rgba(123, 244, 253, 0.466); */
 }
 
 .gameId span {
@@ -50,23 +52,17 @@
   align-items: center;
   height: 100%;
   width: 100%;
-  margin-left: 1rem;
 }
 
 .scoreBoard {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.scoreBoard {
+  margin-bottom: .5rem;
   border-radius: 15px;
   padding: .2rem;
-  flex-direction: column;
-  max-width: 600px;
-  margin-bottom: .5rem;
 }
 
 .playerScore {
@@ -83,31 +79,47 @@
   opacity: 1;
 }
 
-.playerScore .scoreWhite,
-.playerScore .scoreBlack {
-  border: 1px solid rgb(123, 245, 253, .3);
+.scoreWrapper {
+  display: flex;
+  margin-left: auto;
+  min-width: 70px;
+  align-items: center;
+}
+
+.scoreWhite,
+.scoreBlack {
+  border: 2px solid rgb(159 227 231 / 50%);
   border-radius: 50%;
   height: clamp(15px, calc(10px + 2.2vw), 35px);
   width: clamp(15px, calc(10px + 2.2vw), 35px);
-  margin-left: auto;
+  /* margin-left: auto; */
 }
 
 .playerScore .winsWrapper {
   background-color: rgba(70, 146, 179, 0.229);
   padding: .25rem .7rem;
   border-radius: 7px;
+  min-width: 42px;
+  text-align: center;
 }
 
 .playerScore span {
   font-size: clamp(.5rem, calc(.4rem + 2.5vw), 1.2rem);
+  max-width: 65%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .playerScore span.scoreNumber {
+  margin-left: .5rem;
+  text-align: center;
+  min-width: 25px;
   font-size: clamp(.6rem, calc(.45rem + 2.5vw), 1.4rem);
 }
 
 .playerScore span.scoreX {
   line-height: 1;
+  margin-left: .8rem;
 }
 
 .scoreWhite {
@@ -127,24 +139,26 @@
 
 .gameBoardWrapper {
   width: 100%;
-  max-width: 600px;
   display: grid;
-  gap: clamp(.05rem, calc(.1rem + .5vw), .3rem);
+  gap: 2px;
   grid-template-columns: repeat(8, 1fr);
 }
 
+.gameBoardDisabled {
+  opacity: .7;
+  pointer-events: none;
+}
+
 .gameSquare {
-  border-radius: clamp(1px, calc(2px + .5vw), 5px);
+  border-radius: clamp(1px, calc(2px + .5vw), 3px);
   cursor: pointer;
-  background: rgba(99, 177, 207, 0.22);
+  background: #354a50;
   position: relative;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2);
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .gameSquare:after {
@@ -159,10 +173,14 @@
 
 .gamePiece {
   position: absolute;
-  width: 85%;
-  height: 85%;
+  width: 86%;
+  height: 86%;
   border-radius: 50%;
-  /* animation: gamePieceAnimation .4s ease-in-out forwards; */
+  transform: scale(.95);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .gameWrapper.roomFull {
@@ -172,24 +190,30 @@
 
 @keyframes gamePieceAnimation {
   0% {
-    transform: scale(1);
+    transform: scale(.95);
   }
+
   50% {
-    transform: scale(1.1);
-  }
-  100% {
     transform: scale(1);
+  }
+
+  100% {
+    transform: scale(.95);
   }
 }
 
 .whitePiece {
   background: white;
-  /* animation: gamePieceAnimation .7s ease-in-out forwards; */
+  outline: 3px solid rgb(236, 236, 236);
+  outline-offset: -1px;
+  animation: gamePieceAnimation .7s ease-in-out;
 }
 
 .blackPiece {
-  background: black;
-  /* animation: gamePieceAnimation 1s ease-in-out forwards; */
+  background: rgb(19, 18, 18);
+  outline: 3px solid rgb(0, 0, 0);
+  outline-offset: -1px;
+  animation: gamePieceAnimation .7s ease-in-out;
 }
 
 .gameMessageWrapper {
@@ -197,16 +221,21 @@
   max-width: 75vh;
   display: flex;
   border-radius: 15px;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(90deg, rgba(151,245,255,0) 0%, rgba(62, 155, 165, 0.164) 50%, rgba(146,198,203,0) 100%);
+  background: linear-gradient(90deg, rgba(151, 245, 255, 0) 0%, rgba(62, 155, 165, 0.164) 50%, rgba(146, 198, 203, 0) 100%);
   gap: .7rem;
   flex: 1;
   padding: .5rem;
   text-align: center;
   margin-bottom: 1rem;
   margin-top: 1rem;
+}
+
+.gameMessageWrapper .scoreWhite,
+.gameMessageWrapper .scoreBlack {
+  margin-left: 0;
 }
 
 .gameMessageWrapper p {
@@ -222,8 +251,9 @@
   filter: drop-shadow(0 0 4px rgb(123, 245, 253, .4));
 }
 
-.gameMessageWrapper.newMsg {
-  color: rgb(123, 245, 253);
+.gameMessageWrapper p.hideGameMsg {
+  transition: none;
+  opacity: 0;
 }
 
 .gameHr {
@@ -234,18 +264,18 @@
 }
 
 .gameBtnWrapper {
-  /* width: 70%; */
-  max-width: 220px;
+  display: flex;
   margin-top: calc(.7rem + .7vw);
   margin-bottom: 2rem;
   text-align: center;
+  gap: .7rem;
 }
 
 .gameBtnWrapper button {
   font-size: clamp(.5rem, calc(.5rem + 1vw), .9rem);
   background: none;
-  padding: clamp(.5rem, calc(.5rem + 2vw), 1rem) clamp(1rem, calc(1rem + 4.5vw), 3rem);
-  width: 100%;
+  padding: .8rem;
+  min-width: 110px;
   border-radius: 15px;
 }
 
@@ -253,12 +283,15 @@
   0% {
     opacity: 0;
   }
+
   25% {
     opacity: 1;
   }
+
   75% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
@@ -268,7 +301,7 @@
   width: 100%;
   padding: .8rem;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: .7rem;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -288,48 +321,41 @@
   top: 20px;
 }
 
-/* @media screen and (orientation: landscape) {
-  .gameWrapper {
-    flex-direction: row;
-  }
-
-  .gameUI {
-    width: 30%;
-  }
-
-  .gameMessageWrapper {
-    border: 1px solid rgb(123, 245, 253, .6);
-    background: none;
-  }
-
-  .playerScore {
-    width: 100%;
-    justify-content: flex-start;
-    padding-left: 1rem;
+@media screen and (min-width: 400px) {
+  .gameBoardMessage {
+    font-size: .9rem;
   }
 
   .gameBoardWrapper {
-    width: 70%;
-    max-width: 80vh;
+    gap: 3px;
   }
-
-  .gameBtnWrapper {
-    max-width: 100%;
-  }
-
-  .portrait {
-    display: none;
-    pointer-events: none;
-  }
-
-  .landscape {
-    display: flex;
-    pointer-events: initial;
-  }
-} */
+}
 
 @media screen and (min-width: 500px) {
   .playerScore {
     gap: .8rem;
+  }
+
+  .gameBtnWrapper {
+    gap: 1rem;
+  }
+
+  .gameBoardMessage {
+    font-size: 1.1rem;
+  }
+
+  .gameBtnWrapper button {
+    padding: 1rem;
+    min-width: 150px;
+  }
+
+  .gameBoardWrapper {
+    gap: 4px;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  .gameBoardMessage {
+    font-size: 1.4rem;
   }
 }

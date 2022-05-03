@@ -5,7 +5,7 @@ import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Home.module.css'
 
 const Home = () => {
-  const { inGame } = useGameContext()
+  const { inGame, setLocalPlayer, localPlayer, updateLocalPlayer } = useGameContext()
   const navigate = useNavigate()
   const usernameRef = useRef()
   const gameIdRef = useRef()
@@ -23,6 +23,7 @@ const Home = () => {
   const handleEnterGameClick = (e) => {
     e.preventDefault()
     if (!gameIdRef.current.value) return console.log('enter username and game id');
+    setLocalPlayer({ ...localPlayer, name: usernameRef.current.value })
     navigate(`/game/${gameIdRef.current.value}`)
   }
 
@@ -32,12 +33,12 @@ const Home = () => {
       <div className={styles.enterGameWrapper}>
         <form onSubmit={handleEnterGameClick}>
           <label htmlFor="user-name">USERNAME:</label>
-          <input name="user-name" type="text" ref={usernameRef} />
+          <input name="user-name" type="text" ref={usernameRef} autoFocus required />
           <div className={styles.idLabelWrapper}>
             <label htmlFor="game-id">GAME ID:</label>
             <div className={styles.generateId} onClick={handleGenerateIdClick}>GENERATE NEW ID</div>
           </div>
-          <input className={styles.gameIdInput} name="game-id" type="text" ref={gameIdRef} />
+          <input className={styles.gameIdInput} name="game-id" type="text" ref={gameIdRef} required />
           <button type="submit">ENTER GAME</button>
         </form>
       </div>
