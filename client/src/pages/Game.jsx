@@ -370,7 +370,7 @@ const Game = () => {
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
         // Send game state to socket
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        if (emptySquares !== 0) {
+        if (emptySquares > 55) {
           // Change player after slight delay
           setTimeout(() => {
             setNewMsg(true);
