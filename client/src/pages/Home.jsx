@@ -5,13 +5,13 @@ import { useGameContext } from '../contexts/GameContext'
 import styles from '../css/Home.module.css'
 
 const Home = () => {
-  const { inGame, setLocalPlayer, localPlayer, updateLocalPlayer } = useGameContext()
+  const { inGame, setLocalPlayer, localPlayer, roomFull } = useGameContext()
   const navigate = useNavigate()
   const usernameRef = useRef()
   const gameIdRef = useRef()
 
   useEffect(() => {
-    if (inGame) {
+    if (inGame || roomFull) {
       window.location.reload();
     }
   }, [])

@@ -100,10 +100,10 @@ const Game = () => {
   // Set up socket connection at start
   useEffect(() => {
     // Use this connection for live connection
-    const s = io(import.meta.env.VITE_BACKEND_URL)
+    // const s = io(import.meta.env.VITE_BACKEND_URL)
 
     // Use this for local host connection
-    // const s = io('http://localhost:3001')
+    const s = io('http://localhost:3001')
 
     setSocket(s)
   }, [])
@@ -116,7 +116,7 @@ const Game = () => {
 
     // If game is joined, set the local player
     socket.on('game-joined', ({ msg, newPlayerColor, newPlayerName, newPlayerNumber, currentPlayer }) => {
-      // console.log(msg, 'CURRENT PLAYER IN GAME-JOINED:', currentPlayer);
+      // console.log(msg)
       setLocalPlayer({ name: newPlayerName, color: newPlayerColor, number: newPlayerNumber })
       setCurrentPlayer(currentPlayer)
       setInGame(true)
@@ -169,7 +169,7 @@ const Game = () => {
 
     // If room already has 2 players (will open RoomFull-modal)
     socket.on('room-full', message => {
-      console.log(message);
+      // console.log(message);
       setRoomFull(true)
     })
 
@@ -199,6 +199,7 @@ const Game = () => {
 
     // Recieve this from socket if opponent reset the game
     socket.on('opponent-reset', playerData => {
+      console.log('opponent reset whaaat!')
       setLocalPlayer({
         name: playerData.name,
         opponent: playerData.opponent,

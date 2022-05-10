@@ -1,8 +1,8 @@
 // Set up the socket
 const io = require('socket.io')(process.env.PORT || 3001, {
   cors: {
-    // origin: 'http://localhost:3000',
-    origin: process.env.FRONT_END_URL,
+    origin: 'http://localhost:3000',
+    // origin: process.env.FRONT_END_URL,
     methods: ['GET', 'POST']
   },
   pingInterval: 25000,
@@ -109,7 +109,7 @@ io.on('connection', socket => {
       const currentPlayer = playersInGame.filter(player => player.player === socket.id)
       socket.emit('sender-reset', currentPlayer[0])
       const opposingPlayer = playersInGame.filter(player => player.player !== socket.id)
-      socket.broadcast.emit('opponent-reset', opposingPlayer[0])
+      socket.broadcast.to(gameId).emit('opponent-reset', opposingPlayer[0])
       io.in(gameId).emit('reset-game', activeGames[gameId].blackPos)
     } catch (err) {
       console.log(err)

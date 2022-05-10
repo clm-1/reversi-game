@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef } from 'react';
+import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
 import styles from '../css/Game.module.css'
 
 const GameContext = createContext()
