@@ -100,10 +100,10 @@ const Game = () => {
   // Set up socket connection at start
   useEffect(() => {
     // Use this connection for live connection
-    // const s = io(import.meta.env.VITE_BACKEND_URL)
+    const s = io(import.meta.env.VITE_BACKEND_URL)
 
     // Use this for local host connection
-    const s = io('http://localhost:3001')
+    // const s = io('http://localhost:3001')
 
     setSocket(s)
   }, [])
@@ -199,7 +199,6 @@ const Game = () => {
 
     // Recieve this from socket if opponent reset the game
     socket.on('opponent-reset', playerData => {
-      console.log('opponent reset whaaat!')
       setLocalPlayer({
         name: playerData.name,
         opponent: playerData.opponent,
@@ -371,7 +370,7 @@ const Game = () => {
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
         // Send game state to socket
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        if (emptySquares > 55) {
+        if (emptySquares !== 0) {
           // Change player after slight delay
           setTimeout(() => {
             setNewMsg(true);

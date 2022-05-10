@@ -24,7 +24,8 @@
   padding: .45rem 0 .35rem 0;
   font-size: clamp(.4rem, calc(.4rem + 1vw), .9rem);
   color: rgba(123, 244, 253, 0.5);
-  background-color: rgb(125 204 204 / 11%);
+  /* background-color: rgb(125 204 204 / 11%); */
+  background-color: rgba(132, 170, 219, 0.06);
   z-index: 1;
 }
 
@@ -152,7 +153,8 @@
 .gameSquare {
   border-radius: clamp(1px, calc(2px + .5vw), 3px);
   cursor: pointer;
-  background: #354a50;
+  /* background: #354a50; */
+  background: #3a5059;
   position: relative;
   width: 100%;
   display: flex;
@@ -205,8 +207,8 @@
 }
 
 .whitePiece {
-  background: white;
-  border: 3px solid rgb(236, 236, 236);
+  background: #f7f7f7;
+  border: 3px solid rgb(215, 215, 215);
   /* outline: 3px solid rgb(236, 236, 236); */
   /* outline-offset: -1px; */
   animation: gamePieceAnimation .7s ease-in-out;
