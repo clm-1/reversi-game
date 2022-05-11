@@ -79,10 +79,10 @@ const Game = () => {
     setScore({ white: 2, black: 2 })
     setTimeout(() => {
       setGameBoardMsg('switching player colors')
-      setGameMsg(localPlayer.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     }, 1500)
     setTimeout(() => {
       resetClicked.current = false
+      setGameMsg(localPlayer.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
       setGameBoardState(initialGameBoardState)
       setPlacedPieces([39, 40, 48, 49])
       setCurrentValidMoves({})
