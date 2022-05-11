@@ -7,6 +7,7 @@ const useGameContext = () => {
   return useContext(GameContext)
 }
 
+// Initial state for game, four pieces set in middle of board
 const initialGameBoardState = [
   'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X',
   '0', '0', '0', '0', '0', '0', '0', '0', 'X',
@@ -44,6 +45,7 @@ const GameContextProvider = ({ children }) => {
   const [noMoves, setNoMoves] = useState(0)
   const resetClicked = useRef(false)
 
+  // Game messages
   const [newMsg, setNewMsg] = useState(false)
   const [gameMsg, setGameMsg] = useState('New game')
   const gameBoardMsgTimer = useRef(null)
