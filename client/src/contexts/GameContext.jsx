@@ -143,6 +143,7 @@ const GameContextProvider = ({ children }) => {
   // Send reset game event to server, will emit back to both players
   const handleResetGameClick = (gameId) => {
     resetClicked.current = true
+    setCurrentPlayer('B')
     setLocalPlayer({ ...localPlayer, color: localPlayer.color = 'B' ? 'W' : 'B' })
     socket.emit('reset-game', gameId)
   }
