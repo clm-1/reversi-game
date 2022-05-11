@@ -194,7 +194,7 @@ const Game = () => {
         color: playerData.color,
         number: playerData.number,
       })
-      console.log('sender-reset', playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
+      // console.log('sender-reset', playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
       setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     })
 
@@ -206,7 +206,7 @@ const Game = () => {
         color: playerData.color,
         number: playerData.number,
       })
-      console.log('opponent-reset', playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
+      // console.log('opponent-reset', playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
       setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     })
 
@@ -372,7 +372,7 @@ const Game = () => {
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
         // Send game state to socket
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        if (emptySquares > 55) {
+        if (emptySquares > 0) {
           // Change player after slight delay
           setTimeout(() => {
             setNewMsg(true);
@@ -386,10 +386,6 @@ const Game = () => {
       }
     }
   }, [gameBoardState])
-
-  useEffect(() => {
-    console.log('game msg:', gameMsg)
-  }, [gameMsg])
 
   const handleGameSquareClick = async (i) => {
     // If game over or not local players turn, do nothing on click
