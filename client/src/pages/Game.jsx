@@ -75,6 +75,7 @@ const Game = () => {
       gameBoardMsgTimer.current = null
     }
     setGameBoardMsg('starting new game...')
+    setCurrentPlayer('B')
     setScore({ white: 2, black: 2 })
     setTimeout(() => {
       setGameBoardMsg('switching player colors')
@@ -82,7 +83,6 @@ const Game = () => {
     setTimeout(() => {
       resetClicked.current = false
       setGameBoardState(initialGameBoardState)
-      setCurrentPlayer('B')
       setPlacedPieces([39, 40, 48, 49])
       setCurrentValidMoves({})
       setGameOver(false)
