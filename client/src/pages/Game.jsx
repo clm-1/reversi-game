@@ -195,6 +195,7 @@ const Game = () => {
         color: playerData.color,
         number: playerData.number,
       })
+      console.log('sender-reset', playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
       setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     })
 
@@ -206,6 +207,7 @@ const Game = () => {
         color: playerData.color,
         number: playerData.number,
       })
+      console.log('opponent-reset', playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
       setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     })
 
