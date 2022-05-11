@@ -82,7 +82,6 @@ const Game = () => {
     }, 1500)
     setTimeout(() => {
       resetClicked.current = false
-      setGameMsg(localPlayer.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
       setGameBoardState(initialGameBoardState)
       setPlacedPieces([39, 40, 48, 49])
       setCurrentValidMoves({})
@@ -219,7 +218,7 @@ const Game = () => {
     if (localPlayer.color) {
       setGameMsg(localPlayer.color === currentPlayer ? 'Your turn' : 'Opponent\'s turn')
     }
-  }, [localPlayer])
+  }, [localPlayer, currentPlayer])
 
   // Check players length and set the name of the opponent player
   useEffect(() => {
@@ -373,7 +372,7 @@ const Game = () => {
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
         // Send game state to socket
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        if (emptySquares !== 0) {
+        if (emptySquares > 55) {
           // Change player after slight delay
           setTimeout(() => {
             setNewMsg(true);
@@ -387,6 +386,10 @@ const Game = () => {
       }
     }
   }, [gameBoardState])
+
+  useEffect(() => {
+    console.log('game msg:', gameMsg)
+  }, [gameMsg])
 
   const handleGameSquareClick = async (i) => {
     // If game over or not local players turn, do nothing on click
