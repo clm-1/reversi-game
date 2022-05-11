@@ -370,7 +370,7 @@ const Game = () => {
         const emptySquares = tempGameStateArray.filter(square => square === '0').length
         // Send game state to socket
         socket.emit('set-game-state', tempGameStateArray, placedPieces, currentPlayer === 'W' ? 'B' : 'W', blackPos, gameOver, wins)
-        if (emptySquares > 55) {
+        if (emptySquares !== 0) {
           // Change player after slight delay
           setTimeout(() => {
             setNewMsg(true);
@@ -378,8 +378,8 @@ const Game = () => {
             setCurrentPlayer(currentPlayer === 'W' ? 'B' : 'W')
           }, 1400);
         } else {
-          // endGame(gameId, newScore)
-          endGame(gameId, { white: 32, black: 32 })
+          endGame(gameId, newScore)
+          // endGame(gameId, { white: 32, black: 32 })
         }
       }
     }
