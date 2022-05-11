@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   margin: 0 .7rem;
-  top: -.9rem;
+  top: calc(-.9rem - 1.7vh);
 }
 
 /* .homeWrapper h1 {
