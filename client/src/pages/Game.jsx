@@ -79,7 +79,7 @@ const Game = () => {
     setScore({ white: 2, black: 2 })
     setTimeout(() => {
       setGameBoardMsg('switching player colors')
-      setGameMsg(playerData.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
+      setGameMsg(localPlayer.color === 'B' ? 'Your turn' : 'Opponent\'s turn')
     }, 1500)
     setTimeout(() => {
       resetClicked.current = false
